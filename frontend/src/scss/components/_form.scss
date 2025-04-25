@@ -1,0 +1,42 @@
+
+.form{
+
+  &-join{
+    max-width: 460px;
+    padding: 60px;
+    @media screen and (max-width: 440px) {
+      max-width: 400px;
+      padding: 60px;
+    }
+    .button{
+      color: white;
+      background-color: $accentLight;
+    }
+}
+  &__label{
+    display: block;
+    color: white;
+    font-size: 1.2em;
+    padding: 5px;
+  }
+  &__input{
+    height: 40px;
+    display: block;
+    padding-left: 24px;
+    margin-bottom: 20px;
+    font-size: 1em;
+    color: $LightGrey;
+    border-width: 0;
+    background-color: $accentLight;
+  }
+  &__button{
+    margin: 5px;
+    font-size: 1.2em;
+    padding: 10px 30px;
+  }
+  &__content{
+     margin: 20px 0;
+     color: white;
+    text-align: justify;
+  }
+}

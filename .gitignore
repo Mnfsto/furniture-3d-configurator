@@ -1,0 +1,17 @@
+/backend/node_modules/
+/frontend/node_modules/
+# File with secrets (tokens, passwords, API keys, database connection string)
+/frontend/.env
+/backend/.env
+# Files IDE
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Temporary test files
+coverage/
+.nyc_output/

@@ -1,0 +1,105 @@
+@import "resset";
+//@import "fonts";
+@import "variables";
+@import 'components/all';
+
+body {
+  background-color: white;
+}
+
+.wrapper {
+  width: 100vw;
+  height: 100%;
+  background-color: white;
+  margin:auto;
+  max-width: 1400px;
+}
+.container{
+  padding: 20px 40px;
+  @media screen and (max-width: 440px) {
+    padding: 10px 10px;
+  }
+
+}
+
+#threejs-canvas{
+  width: 50%;
+  @media screen and (max-width: 440px) {
+    width: 100%;
+  }
+}
+
+.section{
+  display: flex;
+  flex-wrap: wrap;
+  padding-top: 40px;
+  @media screen and (max-width: 440px) {
+    padding-top: 5px;
+  }
+  &__item{
+    flex: 1 1 auto;
+    width: 50%;
+    padding: 20px;
+  }
+
+  &__sponsor{
+    background-color: white;
+  }
+  &__hero-button{
+    margin: 30px auto;
+  }
+}
+.menu{
+  &__link{
+    display: inline-block;
+    font-size: 1.3em;
+    @media screen and (max-width: 440px) {
+      &:first-child {
+        display: none;
+      }
+    }
+    a{
+      padding: 5px 25px;
+      color: $accentDark;
+      @media screen and (max-width: 440px) {
+        padding: 5px 10px;
+
+      }
+    }
+
+  }
+}
+
+.modal {
+  margin: 0 23%;
+  position: absolute;
+  opacity: 0.97;
+  background-color: $secondLight;
+  @media screen and (max-width: 440px) {
+    margin: auto;
+  }
+
+  &__button-close {
+    padding: 10px;
+    float: right;
+    cursor: pointer;
+  }
+}
+
+
+//.title{
+//  background-color: $primary;
+//  padding: 40px 40px;
+//  &__header{
+//  font: $headingX1;
+//  font-weight: bold;
+//
+//  }
+//  &__subtitle{
+//  font: $title15;
+//  }
+//}
+//.article{
+//  padding: 40px;
+//  background-color: white;
+//}

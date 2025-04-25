@@ -1,0 +1,61 @@
+@font-face {
+  font-family: "Futura";
+  src: url('../fonts/FuturaBookC.ttf');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Futura";
+  src: url('../fonts/FuturaDemiC.ttf');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Lato";
+  src: url('../fonts/Lato-Regular.woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+//Fonts
+
+$headingX1: 2rem "Futura", sans-serif;
+$title15: 0.9375rem "Lato", sans-serif;
+$title20: 1.25rem "Lato", sans-serif;
+$navMenu: 1.25rem "Futura", sans-serif;
+$h2futura: 2.25rem "Futura", sans-serif;
+$paragraph: 0.9375rem "Lato", sans-serif;
+$textshadow: 1px 6px 10px rgba(35, 31, 32, 0.20), 0px 1px 10px rgba(35, 31, 32, 0.21);
+
+%heading{
+  font: $title20;
+  line-height: normal;
+  font-style: normal;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+%parahraph{
+  font: $paragraph;
+}
+
+%parahraph13{
+  @extend %parahraph;
+  font-size: 0.8125rem;
+}
+
+li{
+  @extend %parahraph13;
+  padding-top: 0.8rem;
+}
+
+h1,h2,h3,h4,h5{
+  @extend %heading;
+}
+
+p{
+  @extend %parahraph;
+}
