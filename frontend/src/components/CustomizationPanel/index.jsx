@@ -1,44 +1,81 @@
-function CustomizationPanel ({modelOptions, currentSelections, onOptionChange}) {
-        if (!modelOptions) return <div>Немає опцій для кастомізації.</div>;
+import React from 'react';
 
-        return (
+const CustomizationPanel = ({
+                                modelOptions,
+                                currentSelections,
+                                onOptionChange,
+                                activeColorPalette,
+                                activeColorNames
+                            }) => {
 
-            <div className="customization-panel">
-                <h3>Опції Кастомізації</h3>
-                {Object.entries(modelOptions).map(([optionName, config]) => (
-                    <div key={optionName} className="option-group">
-                        <label>{optionName}:</label>
-                        {config.type === 'color' && (
-                            <div className="color-swatches">
-                                {config.values.map((colorValue) => (
+    if (!modelOptions) return <div>Немає опцій для кастомізації.</div>;
+
+
+    const textureConfig = modelOptions['texture_faasade'];
+    const colorConfig = modelOptions['color_faasade'];
+
+    return (
+        <div className="customization-panel">
+            <h3>Опції Кастомізації</h3>
+
+            {/* --- Texture Selection --- */}
+            {textureConfig && (
+                <div className="option-group">
+                    <label htmlFor="texture_select">Текстура Фасаду:</label>
+                    <select
+                        id="texture_select"
+                        value={currentSelections['texture_faasade']?.value || textureConfig.defaultValue}
+                        onChange={(e) => onOptionChange(
+                            'texture_faasade', // optionName
+                            textureConfig.materialName,
+                            textureConfig.type,
+                            e.target.value // the selected texture path
+                        )}
+                    >
+                        {textureConfig.values.map((textureOption) => (
+                            <option key={textureOption.path} value={textureOption.path}>
+                                {textureOption.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            )}
+
+            {/* --- Color Selection (uses active palette) --- */}
+            {colorConfig && activeColorPalette && (
+                <div className="option-group">
+                    <label>Колір Фасаду:</label>
+                    {activeColorPalette.length > 0 ? (
+                        <div className="color-swatches">
+                            {activeColorPalette.map((colorValue, index) => {
+                                const colorName = activeColorNames && activeColorNames[index] ? activeColorNames[index] : colorValue;
+                                return (
                                     <button
-                                        key={colorValue}
-                                        className={`swatch ${currentSelections[optionName]?.value === colorValue ? 'selected' : ''}`}
-                                        style={{backgroundColor: colorValue}}
-                                        title={colorValue}
-                                        onClick={() => onOptionChange(optionName, config.materialName, config.type, colorValue)}
-                                        aria-label={`Вибрати колір ${colorValue}`}
+                                        key={colorValue + '-' + index} // Ensure unique key if colors repeat across palettes
+                                        className={`swatch ${currentSelections['color_faasade']?.value === colorValue ? 'selected' : ''}`}
+                                        style={{ backgroundColor: colorValue }}
+                                        title={colorName} // Use name for tooltip
+                                        onClick={() => onOptionChange(
+                                            'color_faasade', // optionName
+                                            colorConfig.materialName,
+                                            colorConfig.type,
+                                            colorValue // the selected color hex
+                                        )}
+                                        aria-label={`Вибрати колір ${colorName}`}
                                     />
-                                ))}
-                            </div>
-                        )}
-                        {config.type === 'texture' && (
-                            <select
-                                value={currentSelections[optionName]?.value || config.defaultValue}
-                                onChange={(e) => onOptionChange(optionName, config.materialName, config.type, e.target.value)}
-                            >
-                                {config.values.map((textureOption) => (
-                                    <option key={textureOption.path} value={textureOption.path}>
-                                        {textureOption.name}
-                                    </option>
-                                ))}
-                            </select>
-                        )}
+                                );
+                            })}
+                        </div>
+                    ) : (
+                        <p>Немає доступних кольорів для вибраної текстури.</p>
+                    )}
+                </div>
+            )}
 
-                    </div>
-                ))}
-            </div>
-        );
+            {/* Render other options if any */}
+
+        </div>
+    );
 };
 
 export default CustomizationPanel;

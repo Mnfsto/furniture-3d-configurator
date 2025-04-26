@@ -3,8 +3,10 @@ import {Route, Routes} from "react-router";
 import Configurator from "./components/Configurator";
 import HomePage from "./components/HomePage";
 import "./scss/style.scss"
+import HomeHeader from "./components/HomeHeader";
 function App() {
     const[state, setState] = useState(0);
+
 
     const callBackendAPI = async () => {
         try {
@@ -25,7 +27,6 @@ function App() {
     };
 
     useEffect(() =>{
-
         callBackendAPI()
     },[state]);
 
@@ -35,6 +36,7 @@ function App() {
     }
   return (
     <div className="wrapper">
+        <HomeHeader/>
       <h1>React Furniture Configurator Projec</h1>
         <button onClick={()=>click()}>Fetch</button>
         <Routes>
