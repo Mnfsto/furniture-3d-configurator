@@ -29,16 +29,23 @@ export const modelsConfig = {
             "color_faasade": {
                 type: "color",
                 materialName: "WhiteFaasade",
-                defaultValue: "white",
-                values: ['#ffb000', '#d40000', '#00ff77', '#6c2d2d']
+                defaultValue: "#ffb000",
+                colorName: [
+                    ['Білий', 'Антрацит', 'білий глянсoвий', 'білий матовий'],
+                    ['графіт матовий', 'білий глянсoвий', 'Антрацит', 'Білий']
+                ],
+                values: [
+                    ['#ffb000', '#d40000', '#00ff77', '#6c2d2d'],
+                    ['#c79e9e', '#333232', '#9a6b23', '#ffb000']
+                ]
             },
             'texture_faasade': {
                 type: 'texture',
-                materialName: 'TableTopMaterial',
+                materialName: 'WhiteFaasade',
                 defaultValue: '/models/textures/paper-txtr.jpg',
                 values: [
-                    { name: 'Світле Дерево', path: '/models/textures/wood_light.jpg' },
-                    { name: 'Темний Мармур', path: '/models/textures/marble_dark.jpg' }
+                    { name: 'Світле Дерево', path: '/models/textures/paper-txtr.jpg' },
+                    { name: 'Темний Мармур', path: '/models/textures/wood.png' }
                 ]
             }
         }
@@ -50,20 +57,27 @@ export const modelsConfig = {
             "color_faasade": {
                 type: "color",
                 materialName: "WhiteFaasade.001",
-                defaultValue: "white",
-                values: ['#ffb000', '#d40000', '#00ff77', '#6c2d2d']
+                defaultValue: "#ffb000",
+                colorName: [
+                        ['Білий', 'Антрацит', 'білий глянсoвий', 'білий матовий'],
+                        ['графіт матовий', 'білий глянсoвий', 'Антрацит', 'Білий']
+                ],
+                values: [
+                        ['#ffb000', '#d40000', '#00ff77', '#6c2d2d'],
+                        ['#c79e9e', '#333232', '#9a6b23', '#ffb000']
+                ]
             },
             'texture_faasade': {
                 type: 'texture',
-                materialName: 'TableTopMaterial',
+                materialName: 'WhiteFaasade.001',
                 defaultValue: '/models/textures/paper-txtr.jpg',
                 values: [
-                    { name: 'Світле Дерево', path: '/models/textures/wood_light.jpg' },
-                    { name: 'Темний Мармур', path: '/models/textures/marble_dark.jpg' }
+                    { name: 'Світле Дерево', path: '/models/textures/paper-txtr.jpg' },
+                    { name: 'Темний Мармур', path: '/models/textures/wood.png' }
                 ]
             }
         }
-    },
+    }
 
 
 

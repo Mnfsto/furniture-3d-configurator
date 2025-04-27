@@ -4,13 +4,15 @@ const CustomizationPanel = ({
                                 modelOptions,
                                 currentSelections,
                                 onOptionChange,
-                                activeColorPalette,
-                                activeColorNames
+                                activeColorPalette, // <-- NEW: Receive active colors
+                                activeColorNames    // <-- NEW: Receive active color names
                             }) => {
 
     if (!modelOptions) return <div>Немає опцій для кастомізації.</div>;
+    console.log(activeColorPalette);
+    console.log(activeColorNames);
 
-
+    // Find texture and color configurations
     const textureConfig = modelOptions['texture_faasade'];
     const colorConfig = modelOptions['color_faasade'];
 
@@ -32,8 +34,8 @@ const CustomizationPanel = ({
                             e.target.value // the selected texture path
                         )}
                     >
-                        {textureConfig.values.map((textureOption) => (
-                            <option key={textureOption.path} value={textureOption.path}>
+                        {textureConfig.values.map((textureOption, index)  => (
+                            <option key={`${textureOption.path}-${index}`} value={textureOption.path}>
                                 {textureOption.name}
                             </option>
                         ))}
