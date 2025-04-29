@@ -42,9 +42,9 @@ export const modelsConfig = {
             'texture_faasade': {
                 type: 'texture',
                 materialName: 'WhiteFaasade',
-                defaultValue: '/models/textures/paper-txtr.jpg',
+                defaultValue: '/models/textures/img.png',
                 values: [
-                    { name: 'Світле Дерево', path: '/models/textures/paper-txtr.jpg' },
+                    { name: 'Світле Дерево', path: '/models/textures/img.png' },
                     { name: 'Темний Мармур', path: '/models/textures/wood.png' }
                 ]
             }
@@ -73,7 +73,7 @@ export const modelsConfig = {
                 defaultValue: '/models/textures/paper-txtr.jpg',
                 values: [
                     { name: 'Світле Дерево', path: '/models/textures/paper-txtr.jpg' },
-                    { name: 'Темний Мармур', path: '/models/textures/wood.png' }
+                    { name: 'Темний Мармур', path: '/models/textures/img.png' }
                 ]
             }
         }
@@ -83,6 +83,6 @@ export const modelsConfig = {
 
 }
 
-export const getModelData = (modelId = 'default_id') => {
-    return modelsConfig[modelId] || modelsConfig['default_id'];
+export const getModelData =  (modelId = 'default_id') => {
+    return   modelsConfig[modelId] || modelsConfig['default_id'];
 };

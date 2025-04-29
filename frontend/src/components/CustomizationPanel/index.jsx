@@ -9,9 +9,9 @@ const CustomizationPanel = ({
                             }) => {
 
     if (!modelOptions) return <div>Немає опцій для кастомізації.</div>;
-    console.log(activeColorPalette);
-    console.log(activeColorNames);
-
+    // console.log(activeColorPalette);
+    // console.log(activeColorNames);
+    // console.log(onOptionChange);
     // Find texture and color configurations
     const textureConfig = modelOptions['texture_faasade'];
     const colorConfig = modelOptions['color_faasade'];
@@ -28,10 +28,10 @@ const CustomizationPanel = ({
                         id="texture_select"
                         value={currentSelections['texture_faasade']?.value || textureConfig.defaultValue}
                         onChange={(e) => onOptionChange(
-                            'texture_faasade', // optionName
+                            'texture_faasade',
                             textureConfig.materialName,
                             textureConfig.type,
-                            e.target.value // the selected texture path
+                            e.target.value
                         )}
                     >
                         {textureConfig.values.map((textureOption, index)  => (
