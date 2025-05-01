@@ -103,3 +103,303 @@ body {
 //  padding: 40px;
 //  background-color: white;
 //}
+/* src/components/Configurator/Configurator.css */
+
+/* Стили для основного контейнера и панелей */
+/* Configurator.css - Стили для варианта с наложением */
+
+/* Основной контейнер - база для позиционирования */
+.configurator-container-overlay {
+  position: relative; /* Чтобы дочерние абсолютные элементы позиционировались относительно него */
+  width: 100%;
+  height: 85vh; /* Или другая желаемая высота */
+  overflow: hidden; /* Скрыть все, что выходит за пределы */
+  border-radius: 8px; /* Общее скругление */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  background-color: #f0f0f0; /* Фон на случай, если viewer не загрузится */
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+/* Контейнер для вьювера - занимает все место */
+.viewer-container-overlay {
+  position: absolute;
+  inset: 0; /* top: 0; right: 0; bottom: 0; left: 0; */
+  border-radius: 8px; /* Наследуем скругление */
+  overflow: hidden;
+}
+
+.model-viewer-element {
+  width: 100%;
+  height: 100%;
+  opacity: 1; /* По умолчанию видимый */
+  transition: opacity 0.5s ease-in-out;
+}
+
+/* Можно оставить небольшое затемнение во время загрузки */
+.model-viewer-element.loading {
+  opacity: 0.7;
+}
+
+/* Оверлей загрузки */
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.85); /* Чуть менее прозрачный */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  font-size: 1.2em;
+  color: #333;
+  border-radius: 8px;
+  pointer-events: none; /* Не мешать кликам по вьюверу, если он под ним */
+}
+
+/* Прогресс-бар */
+.progress-bar {
+  display: block;
+  width: 100%;
+  height: 4px; /* Чуть тоньше */
+  background-color: rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: 11;
+  opacity: 1;
+  transition: opacity 0.4s 0.5s; /* Задержка перед исчезновением побольше */
+}
+
+.model-viewer-element.loaded ~ .panel-container-overlay .progress-bar, /* Скрываем, если панель НАД ним */
+.model-viewer-element.loaded > .progress-bar { /* Скрываем, если панель ПОД ним */
+  opacity: 0;
+  pointer-events: none; /* Убрать из потока */
+}
+
+.update-bar {
+  width: 0%;
+  height: 100%;
+  background-color: #3b82f6; /* Синий */
+  transition: width 0.1s;
+}
+
+/* --- Контейнер для ПАНЕЛИ кастомизации --- */
+.panel-container-overlay {
+  position: absolute;
+  bottom: 15px; /* Отступ от нижнего края */
+  left: 50%; /* Центрируем по горизонтали */
+  transform: translateX(-50%); /* Точное центрирование */
+  width: 90%; /* Ширина панели */
+  max-width: 500px; /* Максимальная ширина панели */
+  z-index: 20; /* Поверх вьювера */
+  background-color: rgba(255, 255, 255, 0.9); /* Полупрозрачный белый фон */
+  backdrop-filter: blur(5px); /* Эффект размытия фона (работает не во всех браузерах) */
+  -webkit-backdrop-filter: blur(5px);
+  border-radius: 12px; /* Скругление побольше */
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2); /* Более выраженная тень */
+  padding: 15px; /* Внутренние отступы */
+  transition: opacity 0.3s ease, transform 0.3s ease; /* Плавное появление */
+  opacity: 1;
+}
+
+/* Состояние, когда модель грузится - панель можно скрыть или сделать прозрачнее */
+.panel-container-overlay.panel-loading {
+  opacity: 0.8;
+  /* transform: translateX(-50%) translateY(10px); */ /* Можно немного сместить вниз */
+  pointer-events: none; /* Запретить взаимодействие во время загрузки модели */
+}
+
+
+/* --- Стили для самой панели CustomizationPanel (внутри .panel-container-overlay) --- */
+/* Берем стили из CustomizationPanel.css, но УБИРАЕМ фон, тень, рамку, внешние отступы и ограничение ширины */
+
+.customization-panel {
+  /* Убираем стили контейнера, они теперь у .panel-container-overlay */
+  background-color: transparent;
+  padding: 0; /* Паддинг теперь у родителя */
+  border-radius: 0;
+  box-shadow: none;
+  font-family: inherit; /* Наследуем шрифт */
+  transition: none; /* Убираем transition для вложенного блока */
+  border: none;
+  max-width: none;
+  margin: 0;
+}
+
+.customization-panel.disabled {
+  /* Можно немного уменьшить непрозрачность самой панели, если нужно */
+  /* opacity: 0.8; */
+  /* pointer-events: none; - это уже есть у родителя .panel-loading */
+}
+
+.panel-title {
+  font-size: 1.2em; /* Чуть меньше заголовок */
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 15px;
+  text-align: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding-bottom: 10px;
+}
+
+.option-group {
+  border: none;
+  padding: 0;
+  margin: 0;
+  margin-bottom: 20px; /* Отступ между группами */
+}
+.option-group:last-child {
+  margin-bottom: 0;
+}
+
+
+.group-legend {
+  font-size: 1em;
+  font-weight: 500; /* Нормальный вес */
+  color: #374151; /* Темно-серый */
+  margin-bottom: 12px;
+  padding: 0;
+  width: 100%;
+  /* Убираем нижнюю границу у легенды, если не нужна */
+  /* border-bottom: 1px solid #f3f4f6; */
+  /* padding-bottom: 8px; */
+}
+
+.options-container {
+  display: grid;
+  gap: 10px; /* Уменьшаем отступ между опциями */
+  justify-content: center; /* Центрируем опции в контейнере */
+}
+
+.texture-options {
+  grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)); /* Текстуры чуть меньше */
+}
+
+.color-options {
+  grid-template-columns: repeat(auto-fill, minmax(45px, 1fr)); /* Цвета чуть меньше */
+}
+
+.option-item-texture,
+.option-item-color {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.option-radio-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.option-label {
+  display: inline-block;
+  border: 2px solid transparent; /* Рамка чуть тоньше */
+  padding: 2px; /* Паддинг чуть меньше */
+  border-radius: 6px; /* Скругление чуть меньше */
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  background-color: rgba(255, 255, 255, 0.5); /* Полупрозрачный фон для опций */
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.option-radio-input:not(:disabled) + .option-label:hover {
+  border-color: #9ca3af;
+  transform: scale(1.05); /* Эффект при наведении */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.option-radio-input:focus-visible + .option-label {
+  outline: 2px solid #60a5fa;
+  outline-offset: 1px;
+  border-color: #93c5fd;
+}
+
+.option-radio-input:checked + .option-label {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4); /* Свечение чуть меньше */
+}
+
+.texture-label {
+  width: 65px; /* Размеры текстур */
+  height: 65px;
+  padding: 0;
+}
+
+.texture-label img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.color-label {
+  width: 45px; /* Размеры цветов */
+  height: 45px;
+  border-radius: 50%;
+  padding: 0;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.option-radio-input:checked + .color-label {
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15),
+  0 0 0 2px white,
+  0 0 0 4px #3b82f6; /* Кольцо для цвета */
+  transform: scale(1.05);
+}
+.option-radio-input:not(:disabled) + .color-label:hover {
+  transform: scale(1.1);
+  border-color: transparent;
+}
+
+.selected-checkmark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: rgba(255, 255, 255, 0.9); /* Белая галочка */
+  font-size: 1.3em; /* Размер галочки */
+  font-weight: bold;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.6); /* Тень для читаемости */
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease-in-out;
+}
+
+.option-radio-input:checked + .option-label .selected-checkmark {
+  opacity: 1;
+}
+.texture-label .selected-checkmark {
+  font-size: 1.6em; /* Галочка побольше на текстурах */
+  top: 50%; left: 50%; /* Центрирование */
+}
+
+
+.no-options-message {
+  color: #4b5563; /* Цвет текста сообщения */
+  font-style: italic;
+  width: 100%;
+  padding: 10px 0;
+  text-align: center;
+}
+
+/* Общие стили для сообщений загрузки/ошибок (если нужны вне панели) */
+.status-message {
+  padding: 20px;
+  text-align: center;
+  font-size: 1.1em;
+  border-radius: 6px;
+  margin: 20px;
+}
+
+.error-message {
+  color: #a94442;
+  background-color: #f2dede;
+  border: 1px solid #ebccd1;
+}

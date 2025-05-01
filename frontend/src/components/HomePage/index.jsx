@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import {useCallback, useEffect, useRef} from "react";
 import '@google/model-viewer';
 import CustomizationPanel from "../CustomizationPanel";
 import { getModelData } from '../../config/modelsData';
@@ -12,9 +12,30 @@ import { getModelData } from '../../config/modelsData';
          useEffect(() => {
              console.log(getModelData('default_id'));
              console.log(modleViewer.current)
+
          },[]);
 
+     const applyTexture = useCallback(async () =>{
 
+
+         const material =  await modleViewer.current.model?.materials.find(m => m.name === 'WhiteFaasade');
+            console.log('material', material)
+         try {
+             await modleViewer.current.updateComplete;
+             const textureUrl = '/models/textures/img.png';
+             const texture = await modleViewer.current.createTexture(textureUrl);
+             console.log(texture);
+             const pbr = material.pbrMetallicRoughness;
+             pbr.baseColorTexture.setTexture(texture);
+             console.log(`Текстура изменена на`, textureUrl);
+
+
+         }catch (err) {
+             console.error('Error when applying texture:', err);
+             console.log('Error when applying texture.');
+         }
+
+     },)
 
     return (
         <div>
@@ -29,6 +50,7 @@ import { getModelData } from '../../config/modelsData';
                 ar ar-modes="webxr scene-viewer quick-look"
                 camera-controls
                 tone-mapping="neutral"
+                onLoad =  {applyTexture}
                 poster="poster.webp"
                 shadow-intensity="1">
                 </model-viewer>

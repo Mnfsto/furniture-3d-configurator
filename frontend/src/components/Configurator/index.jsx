@@ -3,11 +3,13 @@ import CustomizationPanel from "../CustomizationPanel";
 import { getModelData } from '../../config/modelsData';
 import {useCallback, useEffect, useRef, useState} from "react";
 import '@google/model-viewer';
+import { experimental_useEffectEvent as useEffectEvent } from 'react';
 
 import hexToRgb from "../../config/hexToRGB";
 const findTextureIndex = (texturePath, textureOptions) => {
     if (!textureOptions || !textureOptions.values) return 0;
     const index = textureOptions.values.findIndex(tex => tex.path === texturePath);
+
     return index >= 0 ? index : 0;
 };
 
@@ -24,6 +26,7 @@ const findTextureIndex = (texturePath, textureOptions) => {
 //     return  modelViewer;
 //
 // };
+
 
 
 
@@ -49,137 +52,110 @@ function Configurator () {
     console.log(customizations)
     console.log(activeColorOptions)
 
-    const applyAllCustomizations = useCallback(async (viewer, currentCustoms) => {
-        if (!viewer?.model?.materials) {
-            console.error("ApplyAllCustomizations: Viewer или модель/материалы не готовы.");
-            return;
-        }
-        if (Object.keys(currentCustoms).length === 0) {
-            console.log("ApplyAllCustomizations: Нет кастомизаций для применения.");
-            return;
-        }
+    let connectedCallback;
+    let timeout;
 
-        console.log("ApplyAllCustomizations: Применение кастомизаций:", currentCustoms);
-
-        try {
-            await viewer.updateComplete; // Ждем завершения предыдущих операций
-
-            for (const material of viewer.model.materials) {
-                console.log(`--- Processing Material for Apply: ${material.name} ---`);
-                if (!material.pbrMetallicRoughness) {
-                    console.warn(`ApplyAllCustomizations: Material "${material.name}" skipped (no PBR).`);
-                    continue;
-                }
-                const pbr = material.pbrMetallicRoughness;
-                const baseColorTextureInfo = pbr.baseColorTexture;
-                let textureApplied = false;
-
-                // --- 1. Применяем ТЕКСТУРУ ---
-                const textureCust = Object.values(currentCustoms).find(
-                    // V--- ИСПРАВЛЕНО СРАВНЕНИЕ ---V
-                    m => m.materialName === material.name && m.type === 'texture'
-                );
-
-                if (textureCust?.value) {
-                    console.log(`ApplyAllCustomizations: Found texture for "${material.name}": ${textureCust.value}`);
-                    try {
-                        const textureUrl = textureCust.value;
-                        // V--- ИСПРАВЛЕН ВЫЗОВ ---V
-                        const texture = await viewer.createTexture(textureUrl);
-
-                        if (texture && baseColorTextureInfo) {
-                            // 1. Устанавливаем текстуру
-                            baseColorTextureInfo.setTexture(texture);
-                            console.log(`ApplyAllCustomizations: Texture set for "${material.name}". Waiting updateComplete...`);
-                            // 2. ЖДЕМ обновления ПОСЛЕ установки текстуры
-                            await viewer.updateComplete;
-                            console.log(`ApplyAllCustomizations: Update complete. Getting sampler for "${material.name}"...`);
-                            // 3. Получаем и настраиваем Sampler
-                            const sampler = baseColorTextureInfo.sampler;
-                            if (sampler) {
-                                console.log(`ApplyAllCustomizations: Sampler found. Setting clamp/scale for "${material.name}".`);
-                                // V--- ИСПРАВЛЕН ДОСТУП И API ---V
-                                sampler.setScale(null);
-                                sampler.setWrapS('clamp-to-edge');
-                                sampler.setWrapT('clamp-to-edge');
-                            } else {
-                                console.error(`ApplyAllCustomizations: Sampler NOT FOUND for "${material.name}" after setTexture + updateComplete.`);
-                            }
-                            pbr.setBaseColorFactor([1, 1, 1, 1]); // Сброс цвета
-                            textureApplied = true;
-                            console.log(`ApplyAllCustomizations: Texture applied successfully to "${material.name}".`);
-                        } else {
-                            console.error(`ApplyAllCustomizations: Failed to create texture OR baseColorTextureInfo missing for "${material.name}".`);
-                            if (baseColorTextureInfo) baseColorTextureInfo.setTexture(null);
-                        }
-                    } catch (err) {
-                        console.error(`ApplyAllCustomizations: Error applying texture "${textureCust.value}" to "${material.name}":`, err);
-                        if (baseColorTextureInfo) baseColorTextureInfo.setTexture(null);
-                    }
-                } else {
-                    // Если текстуры нет в кастомизациях, очищаем существующую
-                    if (baseColorTextureInfo) {
-                        console.log(`ApplyAllCustomizations: No texture customization for "${material.name}". Clearing texture.`);
-                        baseColorTextureInfo.setTexture(null);
-                    }
-                }
-
-                // --- 2. Применяем ЦВЕТ (только если текстура НЕ применялась) ---
-                if (!textureApplied) {
-                    const colorCust = Object.values(currentCustoms).find(
-                        c => c.materialName === material.name && c.type === 'color'
-                    );
-                    if (colorCust?.value) {
-                        console.log(`ApplyAllCustomizations: Found color for "${material.name}": ${colorCust.value}`);
-                        try {
-                            const colorRGB = hexToRgb(colorCust.value);
-                            if (colorRGB && colorRGB.length === 3) {
-                                pbr.setBaseColorFactor([...colorRGB, 1]);
-                                console.log(`ApplyAllCustomizations: Color ${JSON.stringify(colorRGB)} applied to "${material.name}".`);
-                            } else { console.error(`ApplyAllCustomizations: Invalid RGB for "${colorCust.value}"`); }
-                        } catch (colorError) { console.error(`ApplyAllCustomizations: Error applying color "${colorCust.value}" to "${material.name}":`, colorError); }
-                    } else {
-                        console.log(`ApplyAllCustomizations: No color customization for "${material.name}" (and no texture).`);
-                        // Опционально: установить цвет по умолчанию, если нет ни текстуры, ни цвета
-                        // pbr.setBaseColorFactor([0.8, 0.8, 0.8, 1]);
-                    }
-                }
-                console.log(`--- ApplyAllCustomizations: Finished Material: ${material.name} ---`);
-            } // Конец цикла for
-        } catch (err) {
-            console.error("ApplyAllCustomizations: Critical error during apply loop:", err);
-        }
-        //console.log("ApplyAllCustomizations: Finished applying all.");
-    }, []); // useCallback с пустым массивом, т.к. внешние зависимости передаются как аргументы
-    const initialTexture =  (materialName = currentMaterial, initialCustomizations = customizations, textureValue = currentTexturePath , viewer = modelViewerRef, load) =>{
+    const initialTexture =   async (viewer = modelViewerRef, materialName = currentMaterial, initialCustomizations = customizations, textureValue = currentTexturePath, load = () => {}) =>{
         const modelViewer = viewer;
-        console.log(modelViewer)
-        console.log(textureValue);
-        try {
-            applyAllCustomizations(modelViewer, customizations);
-               const ldd = viewer.materials.getMaterialByName(currentMaterial)
-                //const ldd = viewer.materials.ensureLoaded()
-                console.log(modelViewer.current)
-                console.log(ldd)
-                if(viewer?.model) console.log('modelViewer', modelViewer);
-                console.log('Dont load ModelViewer!!!',isLoading)
-                if(!modelViewer)return () => load(false)
+        console.log("Initial");
+        const params = new URLSearchParams(window.location.search);
+        console.log("params", params);
+        const textureValueFromUrl = params.get('texture_faasade');
+        const colorValueFromUrl = params.get('color_faasade');
+        console.log("textureValueFromUrl", textureValueFromUrl);
+        console.log("colorValueFromUrl", colorValueFromUrl);
 
-        // const material = await viewer.current.model?.materials.find(m => m.name === materialName);
-        // const texture = await viewer.createTexture(textureValue);
-        // material.pbrMetallicRoughness.setBaseColorFactor([1, 1, 1, 1]);
-        // material.pbrMetallicRoughness.baseColorTexture.setTexture(texture);
-        }catch (err){
-            console.error("WARRRRRNING",err);
-        }
+            if (modelViewer.current) {
+                
+
+                try {
+                   //const ldd = viewer.materials.getMaterialByName(currentMaterial)
+                   //const ldd = viewer.materials.ensureLoaded()
+                   console.log(modelViewer.current)
+                   // console.log(ldd)
+                   //  if(viewer?.model.model) console.log('modelViewer', modelViewer);
+                   // console.log('Dont load ModelViewer!!!',isLoading)
+                   //  if(!modelViewer)return () => load(false)
+
+                    const material = modelViewer.current.model?.materials[0]
+                    const texture =  await modelViewer.current.createTexture(textureValueFromUrl);
+                    material.pbrMetallicRoughness.baseColorTexture.setTexture(texture);
+
+                    if (params.size > 0){
+                        const material = modelViewer.current.model?.materials[0]
+                        material.pbrMetallicRoughness.setBaseColorFactor(hexToRgb(colorValueFromUrl));
+                    }
+
+                }catch (err){
+                    console.error("WARRRRRNING",err);
+                }
+            }
+
+
     }
 
-    function Handle({ load }) {
+
+        // const onTexture = useEffectEvent(modelViewerRef => {
+        //
+        // });
+
+
         useEffect(() => {
-            load(true)
-            return () => load(false)
-        }, [])
-    }
+            const modelViewer = modelViewerRef.current;
+
+
+            const checkModel = () => {
+                if (modelViewerRef.current) {
+                    console.log(currentMaterial);
+                    console.log(currentTexturePath);
+
+                    setIsModelLoaded(true)
+                    //applyTexture(currentMaterial,currentTexturePath)
+                    initialTexture()
+
+
+
+                } else {
+                    console.log('Модель еще не загружена');
+                    setTimeout(checkModel, 4000); // Проверяем каждые 100 мс
+                }
+            };
+
+            checkModel();
+
+        }, [isModel]);
+
+    const handleModelLoad = useCallback(() => {
+        console.log(">>> Модель ЗАГРУЖЕНА (onLoad) <<<");
+        const viewer = modelViewerRef.current;
+        // const timerId = setTimeout(() => {
+        //     console.log("Таймер сработал, ПЫТАЕМСЯ применить кастомизации...");
+        //     const viewer = modelViewerRef.current;
+        //     if (viewer?.model?.materials) {
+        //         console.log("Модель вроде бы доступна, применяем...");
+        //
+        //         setTimeout(() => {
+        //             console.log('Applying customizations after 100ms delay...');
+        //             if (modelViewerRef.current) { // Перепроверяем ref
+        //                 applyTexture()
+        //             }
+        //         }, 5900); // Задержка 100 мс
+        //
+        //     } else {
+        //         console.error("Таймер сработал, но модель все еще не готова!");
+        //
+        //     }
+        // }, 200);
+        if (viewer) {
+
+
+            //return () => clearTimeout(timerId);
+
+            setIsModelLoaded(true); // Вот теперь модель точно готова
+            //initialTexture(); // Применяем НАЧАЛЬНЫЕ кастомизации
+        }
+    }, [customizations]);
+
 
     const updateShareableLink = useCallback((currentCustoms, currentProdId) => {
         const params = new URLSearchParams();
@@ -192,6 +168,7 @@ function Configurator () {
         const baseUrl = `${window.location.origin}/customize/${currentProdId}`;
         const newLink = `${baseUrl}?${params.toString()}`;
         console.log("Updating link:", newLink);
+
         setShareableLink(newLink);
     }, [])
 
@@ -199,27 +176,28 @@ function Configurator () {
 
 
 
-    // const applyTexture = useCallback(async (materialName = currentMaterial, textureValue = currentTexturePath) =>{
-    //     if (!modelViewerRef.current) return;
-    //     console.log(textureValue);
-    //     console.log(materialName);
-    //     const material =  await modelViewerRef.current.model?.materials.find(m => m.name === materialName);
-    //     try {
-    //         await modelViewerRef.current.updateComplete;
-    //         const textureUrl = textureValue;
-    //         const texture = await modelViewerRef.current.createTexture(textureUrl);
-    //         console.log(texture);
-    //         const pbr = material.pbrMetallicRoughness;
-    //         pbr.baseColorTexture.setTexture(texture);
-    //         console.log(`Текстура изменена на`, textureUrl);
-    //
-    //
-    //     }catch (err) {
-    //         console.error('Error when applying texture:', err);
-    //         console.log('Error when applying texture.');
-    //     }
-    //
-    // },[textureIndex, customizations, currentTexturePath])
+    const applyTexture = useCallback(async (materialName = currentMaterial, textureValue = currentTexturePath) =>{
+        if (!modelViewerRef.current.model) return;
+        console.log(textureValue);
+        console.log(materialName);
+        const material =  await modelViewerRef.current.model?.materials.find(m => m.name === materialName);
+        try {
+            console.log(textureValue);
+            await modelViewerRef.current.updateComplete;
+            const texture = await modelViewerRef.current.createTexture(textureValue);
+            await modelViewerRef.current.updateComplete;
+            material.pbrMetallicRoughness.baseColorTexture.setTexture(texture);
+            material.pbrMetallicRoughness.setBaseColorFactor([1, 1, 1, 1]);
+
+            console.log(`Текстура изменена на`, textureValue);
+
+
+        }catch (err) {
+            console.error('Error when applying texture:', err);
+            console.log('Error when applying texture.');
+        }
+
+    },[textureIndex, customizations, currentTexturePath])
 
     const updateActiveColors = useCallback((textureIndex, colorConfig) => {
         if (!colorConfig || !Array.isArray(colorConfig.values) || !Array.isArray(colorConfig.values[textureIndex])) {
@@ -233,26 +211,26 @@ function Configurator () {
         setIsModelLoaded(true);
     }, []);
 
-    // const applyColor = useCallback(async (materialName, colorValues) => {
-    //     //console.log(colorValues);
-    //     if (!modelViewerRef.current) return;
-    // try{
-    //     const material = await modelViewerRef.current.model?.materials.find(m => m.name === materialName);
-    //     if (material) {
-    //         const colorRGB = hexToRgb(colorValues);
-    //         console.log(colorRGB);
-    //         const pbr = await material.pbrMetallicRoughness;
-    //         pbr.setBaseColorFactor([...colorRGB, 1]);
-    //         console.log(`Цвет материала '${materialName}' изменен на`, colorValues);
-    //     } else {
-    //         console.warn(`Материал с именем '${materialName}' не найден в модели.`);
-    //     }
-    //
-    // } catch (err) {
-    //     console.error('Error when applying color:', err);
-    //     console.log('Error when applying color.');
-    // }
-    // },[customizations,isModel,activeColorOptions])
+    const applyColor = useCallback(async (materialName, colorValues) => {
+        //console.log(colorValues);
+        if (!modelViewerRef.current) return;
+    try{
+        const material = await modelViewerRef.current.model?.materials.find(m => m.name === materialName);
+        if (material) {
+            const colorRGB = hexToRgb(colorValues);
+            console.log(colorRGB);
+            const pbr = await material.pbrMetallicRoughness;
+            pbr.setBaseColorFactor([...colorRGB, 1]);
+            console.log(`Цвет материала '${materialName}' изменен на`, colorValues);
+        } else {
+            console.warn(`Материал с именем '${materialName}' не найден в модели.`);
+        }
+
+    } catch (err) {
+        console.error('Error when applying color:', err);
+        console.log('Error when applying color.');
+    }
+    },[customizations,isModel,activeColorOptions])
 
     // const changeColor = useCallback(() => {
     //     setCurrentColorIndex( currentColorIndex + 1);
@@ -284,13 +262,15 @@ function Configurator () {
         }
         const initialCustomizations = {};
         const params = new URLSearchParams(window.location.search);
+
         let initialTextureIndex = 0;
         let initialColorValue = 0;
         console.log(params)
 
         // Process texture first to determine the color palette
-        const textureConfig = model.options?.['texture_faasade'];
+        const textureConfig = model.options['texture_faasade'];
         let currentTexturePath = textureConfig?.defaultValue;
+
         if (textureConfig) {
             const textureValueFromUrl = params.get('texture_faasade')
             const isValidUrlTexture = textureConfig.values.some(v => v.path === textureValueFromUrl);
@@ -299,15 +279,15 @@ function Configurator () {
             initialTextureIndex = findTextureIndex(initialTexturePath, textureConfig);
             setCurrentTexturePath(initialTexturePath);
             setCurrentMaterial(textureConfig.materialName)
-
+             console.log(textureConfig.materialName);
             initialCustomizations['texture_faasade'] = {
                 materialName: textureConfig.materialName,
                 type: 'texture',
                 value: initialTexturePath
             };
-
+            console.log(initialTextureIndex)
             console.log(initialTexturePath);
-            console.log(modelViewer)
+            // console.log(modelViewer)
 
 
         } else {
@@ -349,7 +329,7 @@ function Configurator () {
             updateShareableLink(initialCustomizations, productId);
             setLoading(false);
 
-    },[updateActiveColors, updateShareableLink, productId]);
+    },[updateActiveColors, updateShareableLink, productId, isModel]);
 
     // Update customization state and derived states (active colors)
     const handleOptionChange = useCallback((optionName, materialName, type, value) => {
@@ -372,7 +352,7 @@ function Configurator () {
                         }
                     }
                 }
-            }
+            };
 
 
             newCustoms[optionName] = { materialName, type, value };
@@ -381,16 +361,19 @@ function Configurator () {
             return newCustoms;
         });
 
-    }, [updateActiveColors,textureIndex ,isModel?.options, productId, updateShareableLink]);
+    }, [isModel?.options, productId, updateShareableLink]);
 
     useEffect(() => {
         const modelViewer =  modelViewerRef.current;
         console.log(modelViewer)
-        if (!isModelLoaded || !modelViewer?.model || Object.keys(customizations).length === 0){
+        if (!isModelLoaded ||  !modelViewer.model || Object.keys(customizations).length === 0){
             console.log(`Apply effect skipped: isModelLoaded=${isModelLoaded}, hasModel=${!!modelViewer?.model}, hasCustomizations=${Object.keys(customizations).length > 0}`);
-            setIsModelLoaded(false);
+
             return;
         }
+
+
+
         console.log("Apply Effec: Applying customizations to model:\", customizations");
 
         const apply = async() => {
@@ -472,28 +455,16 @@ function Configurator () {
 
         };
         apply();
-    },[isModelLoaded, customizations, textureIndex, shareableLink]);
-
-
-    useEffect(() => {
-        const viewer = modelViewerRef.current;
-        // Применяем, только если модель УЖЕ была загружена И есть кастомизации
-        if (isModelLoaded && viewer && Object.keys(customizations).length > 0) {
-            console.log("Re-apply Effect: Customizations changed, model is loaded. Re-applying...");
-            applyAllCustomizations(viewer, customizations);
-        } else {
-            console.log("Re-apply Effect: Skipped (model not loaded yet or no customizations).");
-        }
-    }, [customizations, isModelLoaded, applyAllCustomizations]);
+    },[isModelLoaded, customizations, textureIndex, shareableLink ]);
 
     // --- Model Viewer Event Handlers ---
-    const handleModelLoad = () => {
-        console.log('Model loaded event received.');
-        applyAllCustomizations(modelViewerRef, customizations);
-            //initialTexture();
-            setIsModelLoaded(true);
-
-    }
+    // const handleModelLoad = () => {
+    //     console.log('Model loaded event received.');
+    //
+    //         //initialTexture();
+    //         setIsModelLoaded(true);
+    //
+    // }
 
     const handleModelError = useCallback((event) => {
         console.error('<<< Model loading FAILED! >>>', event.detail);
@@ -507,39 +478,57 @@ function Configurator () {
     if (!isModel) return <div>Не вдалося завантажити дані моделі.</div>;
 
     return (
-        <div>
-            {/*<button onClick={()=>changeColor()}>Change Color</button>*/}
-            {/*<button onClick={()=>applyTexture()}>Change Texture</button>*/}
-            <CustomizationPanel
-                modelOptions={isModel.options}
-                currentSelections={customizations}
-                onOptionChange={handleOptionChange}
-                activeColorPalette={activeColorOptions.values}
-                activeColorNames={activeColorOptions.names}
-            />
-            <div style={{width: '100%', height: '500px', display: 'block'}}>
+        <div className="configurator-container-overlay">
+
+            {/* Контейнер для Model Viewer (занимает все место) */}
+            <div className="viewer-container-overlay">
+                {/* Оверлей загрузки */}
+                {!isModelLoaded && (
+                    <div className="loading-overlay">
+                        Завантаження 3D моделі...
+                    </div>
+                )}
                 <model-viewer
                     ref={(ref) => {
                         modelViewerRef.current = ref;
                     }}
 
                     style={{ width: '100%', height: '100%'}}
+                    className={`model-viewer-element ${isModelLoaded ? 'loaded' : 'loading'}`}
                     id="myModelViewer"
                     exposure="0.008"
                     camera-controls
                     key={isModel.path}
                     src={isModel.path}
                     slot="progress-bar"
-                    fallback = {initialTexture(load)}
                     onLoad={handleModelLoad}
                     onError={handleModelError}
                     tone-mapping="neutral"
                     shadow-intensity="1">
+                    {/* Можно использовать стандартный прогресс-бар model-viewer */}
+                    <div slot="progress-bar" className="progress-bar">
+                        <div className="update-bar"></div>
+                    </div>
                 </model-viewer>
             </div>
-        </div>
 
-    )
+            {/* Контейнер для панели кастомизации (позиционируется абсолютно) */}
+            {/* Рендерим панель, только если конфиг загружен,
+                 а ее активность зависит от isModelLoaded через проп disabled */}
+            <div className={`panel-container-overlay ${!isModelLoaded ? 'panel-loading' : ''}`}>
+                <CustomizationPanel
+                    modelOptions={isModel.options}
+                    currentSelections={customizations}
+                    onOptionChange={handleOptionChange}
+                    activeColorPalette={activeColorOptions.values}
+                    activeColorNames={activeColorOptions.names}
+                    disabled={!isModelLoaded}
+                />
+            </div>
+
+        </div>
+    );
 }
 
 export default Configurator;
+

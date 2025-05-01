@@ -1,83 +1,115 @@
 import React from 'react';
 
-const CustomizationPanel = ({
+
+function CustomizationPanel({
                                 modelOptions,
                                 currentSelections,
                                 onOptionChange,
-                                activeColorPalette, // <-- NEW: Receive active colors
-                                activeColorNames    // <-- NEW: Receive active color names
-                            }) => {
+                                activeColorPalette,
+                                activeColorNames,
+                                disabled = false // ИЗМЕНЕНО: По умолчанию не заблокировано
+                            }) {
 
-    if (!modelOptions) return <div>Немає опцій для кастомізації.</div>;
-    // console.log(activeColorPalette);
-    // console.log(activeColorNames);
-    // console.log(onOptionChange);
-    // Find texture and color configurations
-    const textureConfig = modelOptions['texture_faasade'];
-    const colorConfig = modelOptions['color_faasade'];
+    const textureConfig = modelOptions?.texture_faasade;
+    const colorConfig = modelOptions?.color_faasade;
+
+    // --- Обработчик изменения для radio ---
+    const handleRadioChange = (optionName, materialName, type, value) => {
+        if (!disabled) {
+            onOptionChange(optionName, materialName, type, value);
+        }
+    };
 
     return (
-        <div className="customization-panel">
-            <h3>Опції Кастомізації</h3>
+        <div className={`customization-panel ${disabled ? 'disabled' : ''}`}>
 
-            {/* --- Texture Selection --- */}
-            {textureConfig && (
-                <div className="option-group">
-                    <label htmlFor="texture_select">Текстура Фасаду:</label>
-                    <select
-                        id="texture_select"
-                        value={currentSelections['texture_faasade']?.value || textureConfig.defaultValue}
-                        onChange={(e) => onOptionChange(
-                            'texture_faasade',
-                            textureConfig.materialName,
-                            textureConfig.type,
-                            e.target.value
-                        )}
-                    >
-                        {textureConfig.values.map((textureOption, index)  => (
-                            <option key={`${textureOption.path}-${index}`} value={textureOption.path}>
-                                {textureOption.name}
-                            </option>
-                        ))}
-                    </select>
-                </div>
+            {/* --- Выбор Текстуры --- */}
+            {textureConfig?.values && ( // Упрощенная проверка
+                <fieldset className="option-group texture-group">
+                    <legend className="group-legend">{textureConfig.displayName || 'Текстура Матеріалу'}</legend>
+                    <div className="options-container texture-options">
+                        {textureConfig.values.map((textureOption, index) => {
+                            const id = `texture-option-${index}`;
+                            const isSelected = currentSelections.texture_faasade?.value === textureOption.path;
+                            return (
+                                <div className="option-item-texture" key={id}>
+                                    <input
+                                        type="radio"
+                                        id={id}
+                                        name="texture_faasade_option" // Группируем radio
+                                        value={textureOption.path}
+                                        checked={isSelected}
+                                        onChange={() => handleRadioChange( // Используем onChange
+                                            'texture_faasade',
+                                            textureConfig.materialName,
+                                            'texture',
+                                            textureOption.path
+                                        )}
+                                        disabled={disabled}
+                                        className="option-radio-input"
+                                    />
+                                    <label htmlFor={id} className="option-label texture-label" title={textureOption.name || textureOption.path}>
+                                        <img
+                                            src={textureOption.thumbnail || textureOption.path}
+                                            alt={textureOption.name || 'Текстура'}
+                                            loading="lazy"
+                                        />
+                                        {isSelected && <span className="selected-checkmark">✔</span>}
+                                    </label>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </fieldset>
             )}
 
-            {/* --- Color Selection (uses active palette) --- */}
-            {colorConfig && activeColorPalette && (
-                <div className="option-group">
-                    <label>Колір Фасаду:</label>
+            {/* --- Выбор Цвета --- */}
+            {colorConfig && activeColorPalette && ( // Убедимся, что палитра передана
+                <fieldset className="option-group color-group">
+                    <legend className="group-legend">{colorConfig.displayName || 'Колір Матеріалу'}</legend>
                     {activeColorPalette.length > 0 ? (
-                        <div className="color-swatches">
+                        <div className="options-container color-options">
                             {activeColorPalette.map((colorValue, index) => {
-                                const colorName = activeColorNames && activeColorNames[index] ? activeColorNames[index] : colorValue;
+                                const colorName = activeColorNames?.[index] ?? colorValue;
+                                const id = `color-option-${index}-${colorValue.replace('#','')}`;
+                                const isSelected = currentSelections.color_faasade?.value === colorValue;
                                 return (
-                                    <button
-                                        key={colorValue + '-' + index} // Ensure unique key if colors repeat across palettes
-                                        className={`swatch ${currentSelections['color_faasade']?.value === colorValue ? 'selected' : ''}`}
-                                        style={{ backgroundColor: colorValue }}
-                                        title={colorName} // Use name for tooltip
-                                        onClick={() => onOptionChange(
-                                            'color_faasade', // optionName
-                                            colorConfig.materialName,
-                                            colorConfig.type,
-                                            colorValue // the selected color hex
-                                        )}
-                                        aria-label={`Вибрати колір ${colorName}`}
-                                    />
+                                    <div className="option-item-color" key={id}>
+                                        <input
+                                            type="radio"
+                                            id={id}
+                                            name="color_faasade_option" // Группируем radio
+                                            value={colorValue}
+                                            checked={isSelected}
+                                            onChange={() => handleRadioChange( // Используем onChange
+                                                'color_faasade',
+                                                colorConfig.materialName,
+                                                'color',
+                                                colorValue
+                                            )}
+                                            disabled={disabled}
+                                            className="option-radio-input"
+                                        />
+                                        <label
+                                            htmlFor={id}
+                                            className="option-label color-label"
+                                            title={colorName}
+                                            style={{ backgroundColor: colorValue }}
+                                            aria-label={`Вибрати колір ${colorName}`}
+                                        >
+                                            {isSelected && <span className="selected-checkmark">✔</span>}
+                                        </label>
+                                    </div>
                                 );
                             })}
                         </div>
                     ) : (
-                        <p>Немає доступних кольорів для вибраної текстури.</p>
+                        <p className="no-options-message">Немає доступних кольорів для вибраної текстури.</p>
                     )}
-                </div>
+                </fieldset>
             )}
-
-            {/* Render other options if any */}
-
         </div>
     );
-};
+}
 
 export default CustomizationPanel;
