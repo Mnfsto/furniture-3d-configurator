@@ -108,34 +108,33 @@ body {
 /* Стили для основного контейнера и панелей */
 /* Configurator.css - Стили для варианта с наложением */
 
-/* Основной контейнер - база для позиционирования */
+/* Основной контейнер */
 .configurator-container-overlay {
-  position: relative; /* Чтобы дочерние абсолютные элементы позиционировались относительно него */
+  position: relative;
   width: 100%;
-  height: 85vh; /* Или другая желаемая высота */
-  overflow: hidden; /* Скрыть все, что выходит за пределы */
-  border-radius: 8px; /* Общее скругление */
+  height: 85vh;
+  overflow: hidden;
+  border-radius: 8px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-  background-color: #f0f0f0; /* Фон на случай, если viewer не загрузится */
+  background-color: #f0f0f0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
-/* Контейнер для вьювера - занимает все место */
+/* Контейнер для вьювера */
 .viewer-container-overlay {
   position: absolute;
-  inset: 0; /* top: 0; right: 0; bottom: 0; left: 0; */
-  border-radius: 8px; /* Наследуем скругление */
+  inset: 0;
+  border-radius: 8px;
   overflow: hidden;
 }
 
 .model-viewer-element {
   width: 100%;
   height: 100%;
-  opacity: 1; /* По умолчанию видимый */
+  opacity: 1;
   transition: opacity 0.5s ease-in-out;
 }
 
-/* Можно оставить небольшое затемнение во время загрузки */
 .model-viewer-element.loading {
   opacity: 0.7;
 }
@@ -144,7 +143,7 @@ body {
 .loading-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, 0.85); /* Чуть менее прозрачный */
+  background: rgba(255, 255, 255, 0.85);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -152,14 +151,14 @@ body {
   font-size: 1.2em;
   color: #333;
   border-radius: 8px;
-  pointer-events: none; /* Не мешать кликам по вьюверу, если он под ним */
+  pointer-events: none;
 }
 
 /* Прогресс-бар */
 .progress-bar {
   display: block;
   width: 100%;
-  height: 4px; /* Чуть тоньше */
+  height: 4px;
   background-color: rgba(0, 0, 0, 0.1);
   overflow: hidden;
   position: absolute;
@@ -167,73 +166,257 @@ body {
   left: 0;
   z-index: 11;
   opacity: 1;
-  transition: opacity 0.4s 0.5s; /* Задержка перед исчезновением побольше */
+  transition: opacity 0.4s 0.5s;
 }
 
-.model-viewer-element.loaded ~ .panel-container-overlay .progress-bar, /* Скрываем, если панель НАД ним */
-.model-viewer-element.loaded > .progress-bar { /* Скрываем, если панель ПОД ним */
+.model-viewer-element.loaded .progress-bar {
   opacity: 0;
-  pointer-events: none; /* Убрать из потока */
+  pointer-events: none;
 }
 
 .update-bar {
   width: 0%;
   height: 100%;
-  background-color: #3b82f6; /* Синий */
+  background-color: #3b82f6;
   transition: width 0.1s;
 }
 
-/* --- Контейнер для ПАНЕЛИ кастомизации --- */
+/* Панель кастомизации */
 .panel-container-overlay {
   position: absolute;
-  bottom: 15px; /* Отступ от нижнего края */
-  left: 50%; /* Центрируем по горизонтали */
-  transform: translateX(-50%); /* Точное центрирование */
-  width: 90%; /* Ширина панели */
-  max-width: 500px; /* Максимальная ширина панели */
-  z-index: 20; /* Поверх вьювера */
-  background-color: rgba(255, 255, 255, 0.9); /* Полупрозрачный белый фон */
-  backdrop-filter: blur(5px); /* Эффект размытия фона (работает не во всех браузерах) */
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 500px;
+  z-index: 20;
+  background-color: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
-  border-radius: 12px; /* Скругление побольше */
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2); /* Более выраженная тень */
-  padding: 15px; /* Внутренние отступы */
-  transition: opacity 0.3s ease, transform 0.3s ease; /* Плавное появление */
-  opacity: 1;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+  padding: 15px;
+  transition: transform 0.3s ease, opacity 0.3s ease, max-height 0.3s ease;
+  max-height: 80vh;
+  overflow-y: auto;
 }
 
-/* Состояние, когда модель грузится - панель можно скрыть или сделать прозрачнее */
 .panel-container-overlay.panel-loading {
   opacity: 0.8;
-  /* transform: translateX(-50%) translateY(10px); */ /* Можно немного сместить вниз */
-  pointer-events: none; /* Запретить взаимодействие во время загрузки модели */
+  pointer-events: none;
+}
+
+.panel-container-overlay.collapsed {
+  max-height: 50px; /* Висота кнопки згортання */
+  overflow: hidden;
+  padding: 0;
+}
+
+.toggle-panel-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 35px;
+  height: 35px;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.2em;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.toggle-panel-button:hover:not(:disabled) {
+  background-color: #2563eb;
+  transform: scale(1.1);
+}
+
+.toggle-panel-button:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.selection-description {
+  font-size: 1em;
+  color: #374151;
+  text-align: center;
+  margin-bottom: 15px;
+  padding: 18px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 4px;
+}
+
+.submit-model-button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  background-color: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1em;
+  margin-top: 15px;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.submit-model-button:hover:not(:disabled) {
+  background-color: #059669;
+  transform: scale(1.02);
+}
+
+.submit-model-button:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* Модальное окно */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 90%;
+  position: relative;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+  animation: slideIn 0.3s ease;
+}
+
+.modal-close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.2em;
+  transition: background-color 0.2s;
+}
+
+.modal-close-button:hover {
+  background-color: #dc2626;
+}
+
+.modal-selection-info {
+  margin-bottom: 20px;
+  font-size: 0.9em;
+  color: #374151;
+}
+
+.modal-selection-info p {
+  margin: 5px 0;
+}
+
+.modal-selection-info a {
+  color: #3b82f6;
+  text-decoration: underline;
+  word-break: break-all;
+}
+
+.modal-selection-info img {
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 
-/* --- Стили для самой панели CustomizationPanel (внутри .panel-container-overlay) --- */
-/* Берем стили из CustomizationPanel.css, но УБИРАЕМ фон, тень, рамку, внешние отступы и ограничение ширины */
+.modal-form h3 {
+  font-size: 1.2em;
+  margin-bottom: 15px;
+}
 
+.modal-form div {
+  margin-bottom: 15px;
+}
+
+.modal-form label {
+  display: block;
+  font-size: 0.9em;
+  margin-bottom: 5px;
+}
+
+.modal-form input,
+.modal-form textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+}
+
+.modal-form button {
+  width: 100%;
+  padding: 10px;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.modal-form button:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.modal-form button:hover:not(:disabled) {
+  background-color: #2563eb;
+}
+.copy-link{
+  padding: 10px;
+}
+
+/* Анимации */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Стили для CustomizationPanel */
 .customization-panel {
-  /* Убираем стили контейнера, они теперь у .panel-container-overlay */
   background-color: transparent;
-  padding: 0; /* Паддинг теперь у родителя */
+  padding: 0;
   border-radius: 0;
   box-shadow: none;
-  font-family: inherit; /* Наследуем шрифт */
-  transition: none; /* Убираем transition для вложенного блока */
+  font-family: inherit;
   border: none;
   max-width: none;
   margin: 0;
 }
 
 .customization-panel.disabled {
-  /* Можно немного уменьшить непрозрачность самой панели, если нужно */
-  /* opacity: 0.8; */
-  /* pointer-events: none; - это уже есть у родителя .panel-loading */
+  opacity: 0.8;
 }
 
 .panel-title {
-  font-size: 1.2em; /* Чуть меньше заголовок */
+  font-size: 1.2em;
   font-weight: 600;
   color: #111827;
   margin-bottom: 15px;
@@ -246,37 +429,33 @@ body {
   border: none;
   padding: 0;
   margin: 0;
-  margin-bottom: 20px; /* Отступ между группами */
+  margin-bottom: 20px;
 }
 .option-group:last-child {
   margin-bottom: 0;
 }
 
-
 .group-legend {
   font-size: 1em;
-  font-weight: 500; /* Нормальный вес */
-  color: #374151; /* Темно-серый */
+  font-weight: 500;
+  color: #374151;
   margin-bottom: 12px;
   padding: 0;
   width: 100%;
-  /* Убираем нижнюю границу у легенды, если не нужна */
-  /* border-bottom: 1px solid #f3f4f6; */
-  /* padding-bottom: 8px; */
 }
 
 .options-container {
   display: grid;
-  gap: 10px; /* Уменьшаем отступ между опциями */
-  justify-content: center; /* Центрируем опции в контейнере */
+  gap: 10px;
+  justify-content: center;
 }
 
 .texture-options {
-  grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)); /* Текстуры чуть меньше */
+  grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
 }
 
 .color-options {
-  grid-template-columns: repeat(auto-fill, minmax(45px, 1fr)); /* Цвета чуть меньше */
+  grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
 }
 
 .option-item-texture,
@@ -297,12 +476,12 @@ body {
 
 .option-label {
   display: inline-block;
-  border: 2px solid transparent; /* Рамка чуть тоньше */
-  padding: 2px; /* Паддинг чуть меньше */
-  border-radius: 6px; /* Скругление чуть меньше */
+  border: 2px solid transparent;
+  padding: 2px;
+  border-radius: 6px;
   cursor: pointer;
   transition: all 0.15s ease-in-out;
-  background-color: rgba(255, 255, 255, 0.5); /* Полупрозрачный фон для опций */
+  background-color: rgba(255, 255, 255, 0.5);
   position: relative;
   overflow: hidden;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
@@ -310,7 +489,7 @@ body {
 
 .option-radio-input:not(:disabled) + .option-label:hover {
   border-color: #9ca3af;
-  transform: scale(1.05); /* Эффект при наведении */
+  transform: scale(1.05);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
@@ -322,11 +501,11 @@ body {
 
 .option-radio-input:checked + .option-label {
   border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4); /* Свечение чуть меньше */
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
 }
 
 .texture-label {
-  width: 65px; /* Размеры текстур */
+  width: 65px;
   height: 65px;
   padding: 0;
 }
@@ -340,7 +519,7 @@ body {
 }
 
 .color-label {
-  width: 45px; /* Размеры цветов */
+  width: 45px;
   height: 45px;
   border-radius: 50%;
   padding: 0;
@@ -348,11 +527,10 @@ body {
 }
 
 .option-radio-input:checked + .color-label {
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15),
-  0 0 0 2px white,
-  0 0 0 4px #3b82f6; /* Кольцо для цвета */
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15), 0 0 0 2px white, 0 0 0 4px #3b82f6;
   transform: scale(1.05);
 }
+
 .option-radio-input:not(:disabled) + .color-label:hover {
   transform: scale(1.1);
   border-color: transparent;
@@ -363,10 +541,10 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  color: rgba(255, 255, 255, 0.9); /* Белая галочка */
-  font-size: 1.3em; /* Размер галочки */
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.3em;
   font-weight: bold;
-  text-shadow: 0 0 2px rgba(0, 0, 0, 0.6); /* Тень для читаемости */
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.6);
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.15s ease-in-out;
@@ -375,21 +553,118 @@ body {
 .option-radio-input:checked + .option-label .selected-checkmark {
   opacity: 1;
 }
+
 .texture-label .selected-checkmark {
-  font-size: 1.6em; /* Галочка побольше на текстурах */
-  top: 50%; left: 50%; /* Центрирование */
+  font-size: 1.6em;
+  top: 50%;
+  left: 50%;
 }
 
-
 .no-options-message {
-  color: #4b5563; /* Цвет текста сообщения */
+  color: #4b5563;
   font-style: italic;
   width: 100%;
   padding: 10px 0;
   text-align: center;
 }
 
-/* Общие стили для сообщений загрузки/ошибок (если нужны вне панели) */
+/* Стили для actions-container */
+.actions-container {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 20;
+}
+
+.actions-container button {
+  padding: 8px 16px;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.actions-container button:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.actions-container button:hover:not(:disabled) {
+  background-color: #2563eb;
+  transform: scale(1.02);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .configurator-container-overlay {
+    height: 100vh;
+  }
+
+  .panel-container-overlay {
+    width: 95%;
+    max-width: none;
+    bottom: 10px;
+    padding: 10px;
+  }
+
+  .panel-container-overlay.collapsed {
+    max-height: 50px;
+  }
+
+  .actions-container {
+    top: auto;
+    bottom: 80px;
+    right: 10px;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .actions-container button {
+    padding: 6px 12px;
+    font-size: 0.9em;
+  }
+
+  .modal-content {
+    width: 95%;
+    max-width: 350px;
+  }
+
+  .model-viewer-element {
+    height: 50vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .panel-container-overlay {
+    bottom: 5px;
+  }
+
+  .actions-container {
+    bottom: 60px;
+  }
+
+  .toggle-panel-button {
+    width: 50px;
+    height: 50px;
+    font-size: 2em;
+  }
+
+  .selection-description {
+    font-size: 0.8em;
+  }
+
+  .submit-model-button {
+    font-size: 0.9em;
+    padding: 8px;
+  }
+}
+
+/* Статусы */
 .status-message {
   padding: 20px;
   text-align: center;
@@ -402,4 +677,30 @@ body {
   color: #a94442;
   background-color: #f2dede;
   border: 1px solid #ebccd1;
+}
+
+.copy-link-button {
+  margin-left: 10px;
+  padding: 5px 10px;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+.copy-link-button:hover {
+  background-color: #2563eb;
+}
+
+.copy-link-url a{
+  display: inline-block;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin: 10px;
+  color: grey;
 }

@@ -1,9 +1,9 @@
+
 import {useParams} from "react-router";
 import CustomizationPanel from "../CustomizationPanel";
 import { getModelData } from '../../config/modelsData';
 import {useCallback, useEffect, useRef, useState} from "react";
 import '@google/model-viewer';
-import { experimental_useEffectEvent as useEffectEvent } from 'react';
 
 import hexToRgb from "../../config/hexToRGB";
 const findTextureIndex = (texturePath, textureOptions) => {
@@ -47,83 +47,159 @@ function Configurator () {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isLoading, load] = useState(true)
-
+    const [isPanelCollapsed, setIsPanelCollapsed] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isTextureLoading, setTextureLoading] = useState(false);
+    const [formData, setFormData] = useState({
+        name: '',
+        phone: '',
+        email: '',
+        comment: ''
+    });
     console.log(textureIndex)
     console.log(customizations)
     console.log(activeColorOptions)
 
-    let connectedCallback;
-    let timeout;
+
 
     const initialTexture =   async (viewer = modelViewerRef, materialName = currentMaterial, initialCustomizations = customizations, textureValue = currentTexturePath, load = () => {}) =>{
         const modelViewer = viewer;
         console.log("Initial");
         const params = new URLSearchParams(window.location.search);
         console.log("params", params);
-        const textureValueFromUrl = params.get('texture_faasade');
+        const textureValueFromUrl = params.get('texture_faasade') === null? '/models/textures/img.png' :params.get('texture_faasade');
         const colorValueFromUrl = params.get('color_faasade');
         console.log("textureValueFromUrl", textureValueFromUrl);
         console.log("colorValueFromUrl", colorValueFromUrl);
 
-            if (modelViewer.current) {
-                
+        if (modelViewer.current) {
 
-                try {
-                   //const ldd = viewer.materials.getMaterialByName(currentMaterial)
-                   //const ldd = viewer.materials.ensureLoaded()
-                   console.log(modelViewer.current)
-                   // console.log(ldd)
-                   //  if(viewer?.model.model) console.log('modelViewer', modelViewer);
-                   // console.log('Dont load ModelViewer!!!',isLoading)
-                   //  if(!modelViewer)return () => load(false)
 
+            try {
+                //const ldd = viewer.materials.getMaterialByName(currentMaterial)
+                //const ldd = viewer.materials.ensureLoaded()
+                console.log(modelViewer.current)
+                // console.log(ldd)
+                //  if(viewer?.model.model) console.log('modelViewer', modelViewer);
+                // console.log('Dont load ModelViewer!!!',isLoading)
+                //  if(!modelViewer)return () => load(false)
+
+                const material = modelViewer.current.model?.materials[0]
+                const texture =  await modelViewer.current.createTexture(textureValueFromUrl);
+                material.pbrMetallicRoughness.baseColorTexture.setTexture(texture);
+
+                if (params.size > 0){
                     const material = modelViewer.current.model?.materials[0]
-                    const texture =  await modelViewer.current.createTexture(textureValueFromUrl);
-                    material.pbrMetallicRoughness.baseColorTexture.setTexture(texture);
-
-                    if (params.size > 0){
-                        const material = modelViewer.current.model?.materials[0]
-                        material.pbrMetallicRoughness.setBaseColorFactor(hexToRgb(colorValueFromUrl));
-                    }
-
-                }catch (err){
-                    console.error("WARRRRRNING",err);
+                    material.pbrMetallicRoughness.setBaseColorFactor(hexToRgb(colorValueFromUrl));
+                }else {
+                    material.pbrMetallicRoughness.setBaseColorFactor(hexToRgb("#ffb000"));
                 }
+
+            }catch (err){
+                console.error("WARRRRRNING",err);
             }
+        }
 
 
     }
 
 
-        // const onTexture = useEffectEvent(modelViewerRef => {
-        //
-        // });
+    const handleFormChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleFormSubmit = async (e) => {
+        e.preventDefault();
+        if (!screenshotBlob) {
+            alert('Будь ласка, зробіть скріншот перед відправкою.');
+            return;
+        }
+        try {
+            const formDataToSend = new FormData();
+            formDataToSend.append('name', formData.name);
+            formDataToSend.append('phone', formData.phone);
+            formDataToSend.append('email', formData.email);
+            formDataToSend.append('comment', formData.comment);
+            formDataToSend.append('screenshot', screenshotBlob, 'model-screenshot.png');
+            formDataToSend.append('configuration', JSON.stringify(customizations));
+            formDataToSend.append('shareableLink', shareableLink);
+
+            const response = await fetch('https://your-backend.com/api/submit', {
+                method: 'POST',
+                body: formDataToSend
+            });
+
+            if (response.ok) {
+                alert('Запит успішно надіслано!');
+                setFormData({ name: '', phone: '', email: '', comment: '' });
+                setScreenshotBlob(null);
+                setIsModalOpen(false); // Закриваємо модальне вікно
+            } else {
+                throw new Error('Помилка відправки запиту.');
+            }
+        } catch (err) {
+            console.error('Помилка:', err);
+            alert('Сталася помилка. Спробуйте ще раз.');
+        }
+    };
+
+    const togglePanel = () => {
+        setIsPanelCollapsed(!isPanelCollapsed);
+    };
+
+    const openModal = async () => {
+        const screenshotCreated = await captureScreenshot();
+        if (!screenshotCreated) return;
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
 
 
-        useEffect(() => {
-            const modelViewer = modelViewerRef.current;
+
+    useEffect(() => {
+        const modelViewer = modelViewerRef.current;
 
 
-            const checkModel = () => {
-                if (modelViewerRef.current) {
-                    console.log(currentMaterial);
-                    console.log(currentTexturePath);
+        const checkModel = () => {
+            if (modelViewerRef.current) {
+                console.log(currentMaterial);
+                console.log(currentTexturePath);
 
-                    setIsModelLoaded(true)
-                    //applyTexture(currentMaterial,currentTexturePath)
-                    initialTexture()
+                setIsModelLoaded(true)
+                //applyTexture(currentMaterial,currentTexturePath)
+                initialTexture()
 
 
 
-                } else {
-                    console.log('Модель еще не загружена');
-                    setTimeout(checkModel, 4000); // Проверяем каждые 100 мс
-                }
-            };
+            } else {
+                console.log('Модель еще не загружена');
+                setTimeout(checkModel, 4000); // Проверяем каждые 100 мс
+            }
+        };
 
-            checkModel();
+        checkModel();
 
-        }, [isModel]);
+    }, [isModel]);
+
+    const captureScreenshot = useCallback(async () => {
+        if (!modelViewerRef.current || !isModelLoaded) {
+            console.warn('Модель ще не завантажена.');
+            return false;
+        }
+        try {
+            const blob = await modelViewerRef.current.toBlob({ idealAspect: true, mimeType: 'image/png', quality: 1 });
+            setScreenshotBlob(blob);
+            console.log('Скріншот створено.');
+            return true;
+        } catch (err) {
+            console.error('Помилка створення скріншота:', err);
+            alert('Не вдалося створити скріншот. Спробуйте ще раз.');
+            return false;
+        }
+    }, [isModelLoaded]);
 
     const handleModelLoad = useCallback(() => {
         console.log(">>> Модель ЗАГРУЖЕНА (onLoad) <<<");
@@ -168,7 +244,7 @@ function Configurator () {
         const baseUrl = `${window.location.origin}/customize/${currentProdId}`;
         const newLink = `${baseUrl}?${params.toString()}`;
         console.log("Updating link:", newLink);
-
+        window.history.pushState({}, '', newLink);
         setShareableLink(newLink);
     }, [])
 
@@ -214,22 +290,22 @@ function Configurator () {
     const applyColor = useCallback(async (materialName, colorValues) => {
         //console.log(colorValues);
         if (!modelViewerRef.current) return;
-    try{
-        const material = await modelViewerRef.current.model?.materials.find(m => m.name === materialName);
-        if (material) {
-            const colorRGB = hexToRgb(colorValues);
-            console.log(colorRGB);
-            const pbr = await material.pbrMetallicRoughness;
-            pbr.setBaseColorFactor([...colorRGB, 1]);
-            console.log(`Цвет материала '${materialName}' изменен на`, colorValues);
-        } else {
-            console.warn(`Материал с именем '${materialName}' не найден в модели.`);
-        }
+        try{
+            const material = await modelViewerRef.current.model?.materials.find(m => m.name === materialName);
+            if (material) {
+                const colorRGB = hexToRgb(colorValues);
+                console.log(colorRGB);
+                const pbr = await material.pbrMetallicRoughness;
+                pbr.setBaseColorFactor([...colorRGB, 1]);
+                console.log(`Цвет материала '${materialName}' изменен на`, colorValues);
+            } else {
+                console.warn(`Материал с именем '${materialName}' не найден в модели.`);
+            }
 
-    } catch (err) {
-        console.error('Error when applying color:', err);
-        console.log('Error when applying color.');
-    }
+        } catch (err) {
+            console.error('Error when applying color:', err);
+            console.log('Error when applying color.');
+        }
     },[customizations,isModel,activeColorOptions])
 
     // const changeColor = useCallback(() => {
@@ -279,7 +355,7 @@ function Configurator () {
             initialTextureIndex = findTextureIndex(initialTexturePath, textureConfig);
             setCurrentTexturePath(initialTexturePath);
             setCurrentMaterial(textureConfig.materialName)
-             console.log(textureConfig.materialName);
+            console.log(textureConfig.materialName);
             initialCustomizations['texture_faasade'] = {
                 materialName: textureConfig.materialName,
                 type: 'texture',
@@ -322,12 +398,12 @@ function Configurator () {
             console.log("Color config not found.");
         };
 
-            //applyColor(colorConfig.materialName, colorConfig.defaultValue)
+        //applyColor(colorConfig.materialName, colorConfig.defaultValue)
 
 
-            setCustomizations(initialCustomizations);
-            updateShareableLink(initialCustomizations, productId);
-            setLoading(false);
+        setCustomizations(initialCustomizations);
+        updateShareableLink(initialCustomizations, productId);
+        setLoading(false);
 
     },[updateActiveColors, updateShareableLink, productId, isModel]);
 
@@ -357,6 +433,7 @@ function Configurator () {
 
             newCustoms[optionName] = { materialName, type, value };
             updateShareableLink(newCustoms, productId);
+            setScreenshotBlob(null);
             setScreenshotBlob(null);
             return newCustoms;
         });
@@ -393,14 +470,14 @@ function Configurator () {
                     console.log(textureCust);
                     if (textureCust?.value) {
                         try{
-                        console.log(`Applying texture ${textureCust.value} to ${material.name}`);
+                            console.log(`Applying texture ${textureCust.value} to ${material.name}`);
                             console.log(textureCust.value);
                             const texture = await modelViewer.createTexture(textureCust.value);
                             await modelViewer.updateComplete;
                             material.pbrMetallicRoughness.baseColorTexture.setTexture(texture);
                             material.pbrMetallicRoughness.setBaseColorFactor([1, 1, 1, 1]);
                             //console.log(material.clearcoatNormalScale)
-                        //material.setClearcoatNormalScale(0)
+                            //material.setClearcoatNormalScale(0)
                             //console.log(material.pbrMetallicRoughness)
                             //console.log(material.pbrMetallicRoughness.baseColorTexture)
                             // material.pbrMetallicRoughness.texture.Sampler
@@ -415,7 +492,7 @@ function Configurator () {
                             //console.log(material.normalTexture.texture.sampler);
 
 
-                        textureApplied = true;
+                            textureApplied = true;
                         }catch(err) {
                             console.error(`Error applying texture ${textureCust.value} to ${material.name}`);
                         }
@@ -465,6 +542,10 @@ function Configurator () {
     //         setIsModelLoaded(true);
     //
     // }
+    const copyLink = () => {
+        navigator.clipboard.writeText(shareableLink);
+        alert('Посилання скопійовано!');
+    };
 
     const handleModelError = useCallback((event) => {
         console.error('<<< Model loading FAILED! >>>', event.detail);
@@ -472,6 +553,11 @@ function Configurator () {
         setError('Помилка завантаження 3D моделі.');
         setLoading(false);
     }, []);
+
+    // Формуємо рядок опису вибору
+    const textureName = isModel?.options?.texture_faasade?.values?.[textureIndex]?.name || customizations.texture_faasade?.value?.split('/').pop() || 'Не вибрано';
+    const colorName = activeColorOptions.names[currentColorIndex] || customizations.color_faasade?.value || 'Не вибрано';
+    const selectionDescription = `Матеріал: ${textureName}, Колір: ${colorName}`;
 
     if (loading) return <div>Завантаження...</div>;
     if (error) return <div className="error-message">Помилка: {error}</div>;
@@ -515,7 +601,13 @@ function Configurator () {
             {/* Контейнер для панели кастомизации (позиционируется абсолютно) */}
             {/* Рендерим панель, только если конфиг загружен,
                  а ее активность зависит от isModelLoaded через проп disabled */}
-            <div className={`panel-container-overlay ${!isModelLoaded ? 'panel-loading' : ''}`}>
+            <div className={`panel-container-overlay ${!isModelLoaded ? 'panel-loading' : ''} ${isPanelCollapsed ? 'collapsed' : ''}`}>
+                <button className="toggle-panel-button" onClick={togglePanel} disabled={!isModelLoaded}>
+                    {isPanelCollapsed ? '▶' : '▼'}
+                </button>
+                <div className="selection-description">
+                    {selectionDescription}
+                </div >
                 <CustomizationPanel
                     modelOptions={isModel.options}
                     currentSelections={customizations}
@@ -524,11 +616,74 @@ function Configurator () {
                     activeColorNames={activeColorOptions.names}
                     disabled={!isModelLoaded}
                 />
+                <button className="submit-model-button" onClick={openModal} disabled={!isModelLoaded || isTextureLoading}>
+                    Відправити модель
+                </button>
             </div>
-
+            {isModalOpen && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <button className="modal-close-button" onClick={closeModal}>
+                            ×
+                        </button>
+                        <h3>Залишити запит</h3>
+                        <div className="modal-selection-info">
+                        <p><strong>Вибрана конфігурація:</strong> {selectionDescription}</p>
+                        </div>
+                        <form onSubmit={handleFormSubmit} className="modal-form">
+                            <div>
+                                <label>Ім'я:</label>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    value={formData.name}
+                                    onChange={handleFormChange}
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label>Телефон:</label>
+                                <input
+                                    type="tel"
+                                    name="phone"
+                                    value={formData.phone}
+                                    onChange={handleFormChange}
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label>Email:</label>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleFormChange}
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label>Коментар:</label>
+                                <textarea
+                                    name="comment"
+                                    value={formData.comment}
+                                    onChange={handleFormChange}
+                                />
+                            </div>
+                            <button type="submit" disabled={!screenshotBlob}>
+                                Надіслати
+                            </button>
+                        </form>
+                        <div class={'copy-link'}>
+                        <p className={'copy-link-url'}>
+                            <strong>Посилання:</strong> <a href={shareableLink} target="_blank" rel="noopener noreferrer">{shareableLink}</a>
+                            <button onClick={copyLink} className="copy-link-button">Копіювати</button>
+                        </p>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
 
 export default Configurator;
-
