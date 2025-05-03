@@ -121,10 +121,12 @@ function Configurator () {
             formDataToSend.append('email', formData.email);
             formDataToSend.append('comment', formData.comment);
             formDataToSend.append('screenshot', screenshotBlob, 'model-screenshot.png');
-            formDataToSend.append('configuration', JSON.stringify(customizations));
+            formDataToSend.append('model', productId); // ID продукту як модель
+            formDataToSend.append('color', activeColorOptions.names[currentColorIndex] || customizations.color_faasade?.value || 'Не вибрано');
+            formDataToSend.append('material', isModel?.options?.texture_faasade?.values?.[textureIndex]?.name || customizations.texture_faasade?.value?.split('/').pop() || 'Не вибрано');
             formDataToSend.append('shareableLink', shareableLink);
 
-            const response = await fetch('https://your-backend.com/api/submit', {
+            const response = await fetch('http://localhost:5051/api/submit', {
                 method: 'POST',
                 body: formDataToSend
             });
@@ -133,7 +135,7 @@ function Configurator () {
                 alert('Запит успішно надіслано!');
                 setFormData({ name: '', phone: '', email: '', comment: '' });
                 setScreenshotBlob(null);
-                setIsModalOpen(false); // Закриваємо модальне вікно
+                setIsModalOpen(false);
             } else {
                 throw new Error('Помилка відправки запиту.');
             }
@@ -176,7 +178,7 @@ function Configurator () {
 
             } else {
                 console.log('Модель еще не загружена');
-                setTimeout(checkModel, 4000); // Проверяем каждые 100 мс
+                setTimeout(checkModel, 4000);
             }
         };
 
@@ -227,8 +229,8 @@ function Configurator () {
 
             //return () => clearTimeout(timerId);
 
-            setIsModelLoaded(true); // Вот теперь модель точно готова
-            //initialTexture(); // Применяем НАЧАЛЬНЫЕ кастомизации
+            setIsModelLoaded(true);
+            //initialTexture();
         }
     }, [customizations]);
 
@@ -554,7 +556,6 @@ function Configurator () {
         setLoading(false);
     }, []);
 
-    // Формуємо рядок опису вибору
     const textureName = isModel?.options?.texture_faasade?.values?.[textureIndex]?.name || customizations.texture_faasade?.value?.split('/').pop() || 'Не вибрано';
     const colorName = activeColorOptions.names[currentColorIndex] || customizations.color_faasade?.value || 'Не вибрано';
     const selectionDescription = `Матеріал: ${textureName}, Колір: ${colorName}`;
@@ -598,9 +599,6 @@ function Configurator () {
                 </model-viewer>
             </div>
 
-            {/* Контейнер для панели кастомизации (позиционируется абсолютно) */}
-            {/* Рендерим панель, только если конфиг загружен,
-                 а ее активность зависит от isModelLoaded через проп disabled */}
             <div className={`panel-container-overlay ${!isModelLoaded ? 'panel-loading' : ''} ${isPanelCollapsed ? 'collapsed' : ''}`}>
                 <button className="toggle-panel-button" onClick={togglePanel} disabled={!isModelLoaded}>
                     {isPanelCollapsed ? '▶' : '▼'}

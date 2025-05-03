@@ -103,12 +103,8 @@ body {
 //  padding: 40px;
 //  background-color: white;
 //}
-/* src/components/Configurator/Configurator.css */
 
-/* Стили для основного контейнера и панелей */
-/* Configurator.css - Стили для варианта с наложением */
 
-/* Основной контейнер */
 .configurator-container-overlay {
   position: relative;
   width: 100%;
@@ -120,7 +116,7 @@ body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
-/* Контейнер для вьювера */
+
 .viewer-container-overlay {
   position: absolute;
   inset: 0;
@@ -139,7 +135,7 @@ body {
   opacity: 0.7;
 }
 
-/* Оверлей загрузки */
+
 .loading-overlay {
   position: absolute;
   inset: 0;
@@ -154,7 +150,6 @@ body {
   pointer-events: none;
 }
 
-/* Прогресс-бар */
 .progress-bar {
   display: block;
   width: 100%;
@@ -181,7 +176,7 @@ body {
   transition: width 0.1s;
 }
 
-/* Панель кастомизации */
+
 .panel-container-overlay {
   position: absolute;
   bottom: 15px;
@@ -275,7 +270,7 @@ body {
   cursor: not-allowed;
 }
 
-/* Модальное окно */
+
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -388,7 +383,7 @@ body {
   padding: 10px;
 }
 
-/* Анимации */
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -399,7 +394,7 @@ body {
   to { transform: translateY(0); opacity: 1; }
 }
 
-/* Стили для CustomizationPanel */
+
 .customization-panel {
   background-color: transparent;
   padding: 0;
@@ -568,7 +563,7 @@ body {
   text-align: center;
 }
 
-/* Стили для actions-container */
+
 .actions-container {
   position: absolute;
   top: 15px;
@@ -599,7 +594,7 @@ body {
   transform: scale(1.02);
 }
 
-/* Адаптивность */
+
 @media (max-width: 768px) {
   .configurator-container-overlay {
     height: 100vh;
@@ -664,7 +659,7 @@ body {
   }
 }
 
-/* Статусы */
+
 .status-message {
   padding: 20px;
   text-align: center;

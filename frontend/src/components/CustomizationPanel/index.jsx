@@ -7,13 +7,13 @@ function CustomizationPanel({
                                 onOptionChange,
                                 activeColorPalette,
                                 activeColorNames,
-                                disabled = false // ИЗМЕНЕНО: По умолчанию не заблокировано
+                                disabled = false
                             }) {
 
     const textureConfig = modelOptions?.texture_faasade;
     const colorConfig = modelOptions?.color_faasade;
 
-    // --- Обработчик изменения для radio ---
+
     const handleRadioChange = (optionName, materialName, type, value) => {
         if (!disabled) {
             onOptionChange(optionName, materialName, type, value);
@@ -23,8 +23,8 @@ function CustomizationPanel({
     return (
         <div className={`customization-panel ${disabled ? 'disabled' : ''}`}>
 
-            {/* --- Выбор Текстуры --- */}
-            {textureConfig?.values && ( // Упрощенная проверка
+
+            {textureConfig?.values && (
                 <fieldset className="option-group texture-group">
                     <legend className="group-legend">{textureConfig.displayName || 'Текстура Матеріалу'}</legend>
                     <div className="options-container texture-options">
@@ -36,10 +36,10 @@ function CustomizationPanel({
                                     <input
                                         type="radio"
                                         id={id}
-                                        name="texture_faasade_option" // Группируем radio
+                                        name="texture_faasade_option"
                                         value={textureOption.path}
                                         checked={isSelected}
-                                        onChange={() => handleRadioChange( // Используем onChange
+                                        onChange={() => handleRadioChange(
                                             'texture_faasade',
                                             textureConfig.materialName,
                                             'texture',
@@ -64,7 +64,7 @@ function CustomizationPanel({
             )}
 
             {/* --- Выбор Цвета --- */}
-            {colorConfig && activeColorPalette && ( // Убедимся, что палитра передана
+            {colorConfig && activeColorPalette && (
                 <fieldset className="option-group color-group">
                     <legend className="group-legend">{colorConfig.displayName || 'Колір Матеріалу'}</legend>
                     {activeColorPalette.length > 0 ? (
@@ -78,10 +78,10 @@ function CustomizationPanel({
                                         <input
                                             type="radio"
                                             id={id}
-                                            name="color_faasade_option" // Группируем radio
+                                            name="color_faasade_option"
                                             value={colorValue}
                                             checked={isSelected}
-                                            onChange={() => handleRadioChange( // Используем onChange
+                                            onChange={() => handleRadioChange(
                                                 'color_faasade',
                                                 colorConfig.materialName,
                                                 'color',
