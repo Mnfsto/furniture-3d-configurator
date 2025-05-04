@@ -1,10 +1,16 @@
 .header {
   &__social-links{
     padding-top:20px;
+
   }
   @media (max-width: 440px) {
     &__social-links{
       padding-top: 20px;
+      display: none;
+
+    }
+    &__nav{
+      display: none;
     }
   }
   .container {

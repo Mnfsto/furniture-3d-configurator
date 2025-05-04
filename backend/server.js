@@ -30,19 +30,27 @@ const setupServer = (port) => {
     app.use(express.json());
     const upload = multer();
 
+    // const transporter = nodemailer.createTransport({
+    //     host: process.env.SMTP_HOST,
+    //     port: 465,
+    //     secure: true,
+    //     auth: {
+    //         type: 'OAuth2',
+    //         user: process.env.SMTP_USER,
+    //         clientId: process.env.SMTP_CLIENT_ID,
+    //         clientSecret: process.env.SMTP_CLIENT_SECRET,
+    //         refreshToken: process.env.SMTP_REFRESH_TOKEN,
+    //         accessToken: process.env.SMTP_ACCESS_TOKEN,
+    //     }
+    // });
+
     const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: 465,
-        secure: true,
+        service: 'gmail',
         auth: {
-            type: 'OAuth2',
-            user: process.env.SMTP_USER,
-            clientId: process.env.SMTP_CLIENT_ID,
-            clientSecret: process.env.SMTP_CLIENT_SECRET,
-            refreshToken: process.env.SMTP_REFRESH_TOKEN,
-            accessToken: process.env.SMTP_ACCESS_TOKEN,
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS
         }
-    });
+    })
 
     app.post('/api/submit', upload.single('screenshot'), async (req, res) => {
         try {
