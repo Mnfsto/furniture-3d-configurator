@@ -24,11 +24,11 @@
 export const modelsConfig = {
     'default_id':{
         name: "Suspended_cabinet",
-        path: "/models/1.glb",
+        path: "/models/1_fix_object.glb",
         options: {
             "color_faasade": {
                 type: "color",
-                materialName: "WhiteFaasade",
+                materialName: "faasade",
                 defaultValue: "#ffb000",
                 colorName: [
                     ['Білий', 'Антрацит', 'білий глянсoвий', 'білий матовий'],
@@ -41,7 +41,7 @@ export const modelsConfig = {
             },
             'texture_faasade': {
                 type: 'texture',
-                materialName: 'WhiteFaasade',
+                materialName: 'faasade',
                 defaultValue: '/models/textures/img.png',
                 values: [
                     { name: 'Світле Дерево', path: '/models/textures/img.png' },
@@ -52,11 +52,11 @@ export const modelsConfig = {
     },
     'fiji-80-2-Б-An_id':{
         name: "Suspended_cabinet",
-        path: "/models/1_3.glb",
+        path: "/models/1_3_fix_object.glb",
         options: {
             "color_faasade": {
                 type: "color",
-                materialName: "WhiteFaasade.001",
+                materialName: "faasade",
                 defaultValue: "#ffb000",
                 colorName: [
                         ['Білий', 'Антрацит', 'білий глянсoвий', 'білий матовий'],
@@ -69,7 +69,35 @@ export const modelsConfig = {
             },
             'texture_faasade': {
                 type: 'texture',
-                materialName: 'WhiteFaasade.001',
+                materialName: 'faasade',
+                defaultValue: '/models/textures/paper-txtr.jpg',
+                values: [
+                    { name: 'Світле Дерево', path: '/models/textures/paper-txtr.jpg' },
+                    { name: 'Темний Мармур', path: '/models/textures/img.png' }
+                ]
+            }
+        }
+    },
+    'fiji-83-2-Б-An_id':{
+        name: "Suspended_cabinet",
+        path: "/models/1_2_fix_object.glb",
+        options: {
+            "color_faasade": {
+                type: "color",
+                materialName: "faasade",
+                defaultValue: "#ffb000",
+                colorName: [
+                    ['Білий', 'Антрацит', 'білий глянсoвий', 'білий матовий'],
+                    ['графіт матовий', 'білий глянсoвий', 'Антрацит', 'Білий']
+                ],
+                values: [
+                    ['#ffb000', '#d40000', '#00ff77', '#6c2d2d'],
+                    ['#c79e9e', '#333232', '#9a6b23', '#ffb000']
+                ]
+            },
+            'texture_faasade': {
+                type: 'texture',
+                materialName: 'faasade',
                 defaultValue: '/models/textures/paper-txtr.jpg',
                 values: [
                     { name: 'Світле Дерево', path: '/models/textures/paper-txtr.jpg' },
