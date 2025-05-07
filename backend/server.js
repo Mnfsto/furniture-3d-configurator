@@ -5,6 +5,7 @@ const bodyParser = require("express");
 const cors = require('cors');
 const multer = require('multer');
 const nodemailer = require('nodemailer');
+const postmark =  require('postmark');
 const PORT = process.env.PORT || 8080;
 
 const setupServer = (port) => {
@@ -44,13 +45,13 @@ const setupServer = (port) => {
     //     }
     // });
 
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS
-        }
-    })
+    // const transporter = nodemailer.createTransport({
+    //     service: 'gmail',
+    //     auth: {
+    //         user: process.env.EMAIL_USER,
+    //         pass: process.env.EMAIL_PASS
+    //     }
+    // })
 
     app.post('/api/submit', upload.single('screenshot'), async (req, res) => {
         try {
@@ -63,11 +64,13 @@ const setupServer = (port) => {
                 return res.status(400).send('Усі поля та скріншот є обов’язковими.');
             }
 
+            const client = new postmark.ServerClient(process.env.POSTMORT_API_KEY);
+
             const mailToOwner = {
-                from: 'your-real-email@gmail.com',
-                to: 'owner-email@gmail.com',
-                subject: `Новий запит від ${name}`,
-                text: `
+                "From": process.env.SMTP_USER,
+                "To": process.env.SMTP_USER,
+                "Subject": `Новий запит від ${name}`,
+                "TextBody": `
         Ім'я: ${name}
         Телефон: ${phone}
         Email: ${email}
@@ -77,19 +80,20 @@ const setupServer = (port) => {
         Матеріал: ${material}
         Посилання: ${shareableLink}
       `,
-                attachments: [
+                "Attachments": [
                     {
-                        filename: 'model-screenshot.png',
-                        content: screenshot.buffer
+                        "Name": "model-screenshot.png",
+                        "Content": screenshot.buffer.toString('base64'),
+                        "ContentType": "image/png"
                     }
                 ]
             };
 
             const mailToClient = {
-                from: 'your-real-email@gmail.com',
-                to: email,
-                subject: 'Ваш запит отримано',
-                text: `
+                "From": process.env.SMTP_USER,
+                "To": email,
+                "Subject": 'Ваш запит отримано',
+                "TextBody": `
         Дякуємо за ваш запит, ${name}!
         Ваш вибір:
         - Модель: ${model}
@@ -100,8 +104,50 @@ const setupServer = (port) => {
       `
             };
 
-            await transporter.sendMail(mailToOwner);
-            await transporter.sendMail(mailToClient);
+
+            //             const mailToOwner = {
+      //           from: process.env.SMTP_USER,
+      //           to: process.env.SMTP_USER,
+      //           subject: `Новий запит від ${name}`,
+      //           text: `
+      //   Ім'я: ${name}
+      //   Телефон: ${phone}
+      //   Email: ${email}
+      //   Коментар: ${comment || 'Немає коментаря'}
+      //   Модель: ${model}
+      //   Колір: ${color}
+      //   Матеріал: ${material}
+      //   Посилання: ${shareableLink}
+      // `,
+      //           attachments: [
+      //               {
+      //                   filename: 'model-screenshot.png',
+      //                   content: screenshot.buffer
+      //               }
+      //           ]
+      //       };
+      //
+      //       const mailToClient = {
+      //           from: process.env.SMTP_USER,
+      //           to: email,
+      //           subject: 'Ваш запит отримано',
+      //           text: `
+      //   Дякуємо за ваш запит, ${name}!
+      //   Ваш вибір:
+      //   - Модель: ${model}
+      //   - Колір: ${color}
+      //   - Матеріал: ${material}
+      //   Ви можете переглянути вашу конфігурацію за посиланням: ${shareableLink}
+      //   Ми зв'яжемося з вами найближчим часом.
+      // `
+      //       };
+
+
+
+                await client.sendEmail(mailToOwner);
+                await client.sendEmail(mailToClient);
+      //       await transporter.sendMail(mailToOwner);
+      //       await transporter.sendMail(mailToClient);
             res.status(200).send('Запит успішно надіслано.');
         } catch (err) {
             console.error('Помилка:', err);
