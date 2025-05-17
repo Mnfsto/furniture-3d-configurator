@@ -567,9 +567,8 @@ function Configurator () {
     return (
         <div className="configurator-container-overlay">
 
-            {/* Контейнер для Model Viewer (занимает все место) */}
+
             <div className="viewer-container-overlay">
-                {/* Оверлей загрузки */}
                 {!isModelLoaded && (
                     <div className="loading-overlay">
                         Завантаження 3D моделі...
@@ -592,7 +591,7 @@ function Configurator () {
                     onError={handleModelError}
                     tone-mapping="neutral"
                     shadow-intensity="1">
-                    {/* Можно использовать стандартный прогресс-бар model-viewer */}
+
                     <div slot="progress-bar" className="progress-bar">
                         <div className="update-bar"></div>
                     </div>

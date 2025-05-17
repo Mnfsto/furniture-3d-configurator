@@ -1,62 +1,234 @@
-import {useCallback, useEffect, useRef} from "react";
+import {useCallback, useEffect, useRef, useState} from "react";
 import '@google/model-viewer';
-import CustomizationPanel from "../CustomizationPanel";
 import { getModelData } from '../../config/modelsData';
+import hexToRgb from "../../config/hexToRGB";
 
- function HomePage () {
-        const modleViewer = useRef()
+
+const findTextureIndex = (texturePath, textureOptions) => {
+    if (!textureOptions || !textureOptions.values) return 0;
+    const index = textureOptions.values.findIndex(tex => tex.path === texturePath);
+
+    return index >= 0 ? index : 0;
+};
+
+function HomePage () {
+    const modelViewerRef = useRef();
+    const [isModelLoaded, setIsModelLoaded] = useState(false);
+    const [isModel, setModel] = useState(null);
+    const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [isHide, setHide] = useState(false);
+    const modelViewerSliderRef = useRef();
+    const [sliderModel, setSliderModel] = useState({
+        name: 'Chair',
+        src: '/models/1.glb',
+        poster: '/assets/img.png',
+        description: 'Сучасний стілець із ергономічним дизайном, ідеальний для дому чи офісу.'
+    });
+
+    const initialTexture =   async (viewer, materialName , initialCustomizations , textureValue , load = () => {}) =>{
+        const modelViewer = viewer;
+        console.log("Initial");
+
+        const colorValue = initialCustomizations;
+        const texturePath  = textureValue;
+
+        if (modelViewer.current) {
+
+
+            try {
+                //const ldd = viewer.materials.getMaterialByName(currentMaterial)
+                //const ldd = viewer.materials.ensureLoaded()
+                console.log(modelViewer.current)
+                // console.log(ldd)
+                //  if(viewer?.model.model) console.log('modelViewer', modelViewer);
+                // console.log('Dont load ModelViewer!!!',isLoading)
+                //  if(!modelViewer)return () => load(false)
+
+                const material = modelViewer.current.model?.materials[0]
+                const texture =  await modelViewer.current.createTexture(texturePath);
+                material.pbrMetallicRoughness.baseColorTexture.setTexture(texture);
+                material.pbrMetallicRoughness.setBaseColorFactor(hexToRgb(colorValue.defaultValue));
+            }catch (err){
+                console.error("WARRRRRNING",err);
+            }
+        }
+
+
+    }
+
+    useEffect(() => {
+        setLoading(true);
         const model = getModelData('default_id');
-        const path = model.path;
-        console.log(path)
+        setModel(model);
+        console.log(model)
+        const currentMaterial = model.options['texture_faasade'].materialName;
+        const cusomization = model.options['color_faasade'];
+        const texturePath = model.options['texture_faasade'].defaultValue;
+        const colorValue = model.defaultValue;
+        const animation = () =>{
+            console.log("hideeeeeee")
+            setHide(true);
+        }
+        const checkModel = () => {
+            if (modelViewerRef.current) {
+                setIsModelLoaded(true)
+                initialTexture(modelViewerRef, currentMaterial, cusomization, texturePath);
+                setTimeout(animation, 5000)
+            } else {
+                console.log('Модель еще не загружена');
+                setTimeout(checkModel, 4000);
+            }
+        };
 
-         useEffect(() => {
-             console.log(getModelData('default_id'));
-             console.log(modleViewer.current)
+        checkModel();
+        setLoading(false);
+        setError(null);
+        return clearTimeout(animation);
+    }, [isModel]);
 
-         },[]);
+    const handleModelError = useCallback((event) => {
+        console.error('<<< Model loading FAILED! >>>', event.detail);
+        console.error('Model loading error:', event.detail);
+        setError('Помилка завантаження 3D моделі.');
+        setLoading(false);
+    }, []);
 
-     const applyTexture = useCallback(async () =>{
+    const handleModelLoad = () => {
+        console.log('Model loaded event received.');
+        //initialTexture();
 
+    }
 
-         const material =  await modleViewer.current.model?.materials.find(m => m.name === 'WhiteFaasade');
-            console.log('material', material)
-         try {
-             await modleViewer.current.updateComplete;
-             const textureUrl = '/models/textures/img.png';
-             const texture = await modleViewer.current.createTexture(textureUrl);
-             console.log(texture);
-             const pbr = material.pbrMetallicRoughness;
-             pbr.baseColorTexture.setTexture(texture);
-             console.log(`Текстура изменена на`, textureUrl);
+    // Нова функція для переключення моделей у слайдері
+    const switchSrc = (name) => {
+        const base = `../../assets/ShopifyModels/${name}`;
+        setSliderModel({
+            name,
+            src: `${base}.glb`,
+            poster: `${base}.webp`
+        });
+    };
 
+    // Нова функція для кнопки "Сконфігурировать модель"
+    const configureModel = () => {
+        // Приклад: відкриваємо конфігуратор у новому вікні
+        window.open(`/customize/${sliderModel.name.toLowerCase()}`, '_blank');
+        // Альтернатива: console.log для дебагінгу
+        // console.log(`Відкрити конфігуратор для моделі: ${sliderModel.name}`);
+    };
 
-         }catch (err) {
-             console.error('Error when applying texture:', err);
-             console.log('Error when applying texture.');
-         }
+    // Обробка події beforexrselect для слайдера
+    useEffect(() => {
+        const slider = document.querySelector('.slider');
+        if (slider) {
+            const preventXRSelect = (ev) => ev.preventDefault();
+            slider.addEventListener('beforexrselect', preventXRSelect);
+            return () => slider.removeEventListener('beforexrselect', preventXRSelect);
+        }
+    }, []);
 
-     },)
+    if (loading) return <div>Завантаження...</div>;
+    if (error) return <div className="error-message">Помилка: {error}</div>;
+    if (!isModel) return <div>Не вдалося завантажити дані моделі.</div>;
 
     return (
-        <div>
-            <button >Change Color</button>
-        <CustomizationPanel/>
-            <div style={{width: '100%', height: '500px', display: 'block'}}>
-            <model-viewer
-                ref={modleViewer}
-                style={{ width: '100%', height: '100%'}}
-                id="myModelViewer"
-                src={path}
-                ar ar-modes="webxr scene-viewer quick-look"
-                camera-controls
-                tone-mapping="neutral"
-                onLoad =  {applyTexture}
-                poster="poster.webp"
-                shadow-intensity="1">
+        <div class="wrapper">
+            <div className={`viewer-container-overlay`}>
+                {!isModelLoaded && (
+                    <div className="loading-overlay">
+                        Завантаження 3D моделі...
+                    </div>
+                )}
+                <model-viewer
+                    ref={(ref) => {
+                        modelViewerRef.current = ref;
+                    }}
+                    className={`model-viewer-element ${isModelLoaded ? 'loaded' : 'loading'}  ${isHide ? 'hide' : ''}`}
+                    id="myModelViewer"
+                    exposure="0.008"
+                    camera-controls
+                    key={isModel.path}
+                    src={isModel.path}
+                    slot="progress-bar"
+                    onLoad={handleModelLoad}
+                    onError={handleModelError}
+                    tone-mapping="neutral"
+                    shadow-intensity="1">
+
+                    <div slot="progress-bar" className="progress-bar">
+                        <div className="update-bar"></div>
+                    </div>
+                    <h1 className={"title_animation"}>Furniture Constructor</h1>
                 </model-viewer>
+                <div className="slider-container">
+
+                    <model-viewer
+                        ref={modelViewerSliderRef}
+                        src={sliderModel.src}
+
+                        shadow-intensity="1"
+                        ar
+                        camera-controls
+                        touch-action="pan-y"
+                        alt="A 3D model carousel"
+                        className="model-viewer-slider "
+                        exposure="0.008"
+                    >
+                        <button slot="ar-button" id="ar-button">
+                            View in your space
+                        </button>
+                        <div id="ar-prompt">
+                            <img src="/assets/img.png" alt="AR prompt hand" />
+                        </div>
+                        <button id="ar-failure">
+                            AR is not tracking!
+                        </button>
+                        <div className="slider">
+                            <div className="slides">
+                                {[
+                                    { name: 'Chair', poster: '/assets/img.png' },
+                                    { name: 'Mixer', poster: '/assets/img.png' },
+                                    { name: 'GeoPlanter', poster: '/assets/img.png' },
+                                    { name: 'ToyTrain', poster: '/assets/img.png' },
+                                    { name: 'Canoe', poster: '/assets/img.png' }
+                                ].map((model) => (
+                                    <button
+                                        key={model.name}
+                                        className={`slide ${sliderModel.name === model.name ? 'selected' : ''}`}
+                                        onClick={() => switchSrc(model.name)}
+                                        style={{ backgroundImage: `url(${model.poster})` }}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+
+                    </model-viewer>
+                    <div className="model-info">
+                        <h1>{sliderModel.name}</h1>
+                        <p className="model-description">
+                            {sliderModel.description || 'Опис моделі недоступний.'}
+                        </p>
+                        <button
+                            className="configure-button"
+                            onClick={configureModel}
+                            aria-label={`Сконфігурувати модель ${sliderModel.name}`}
+                        >
+                            Сконфігурувати модель
+                        </button>
+                        <div className="contact-info">
+                            <p>
+                                <a href="tel:+380123456789">+380 123 456 789</a>
+                            </p>
+                            <p>
+                                <a href="mailto:info@example.com">info@example.com</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );
 };
 
- export default HomePage;
+export default HomePage;
