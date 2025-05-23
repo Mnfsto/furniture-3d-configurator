@@ -92,7 +92,7 @@ function Configurator () {
                     const material = modelViewer.current.model?.materials[0]
                     material.pbrMetallicRoughness.setBaseColorFactor(hexToRgb(colorValueFromUrl));
                 }else {
-                    material.pbrMetallicRoughness.setBaseColorFactor(hexToRgb("#ffb000"));
+                    material.pbrMetallicRoughness.setBaseColorFactor(hexToRgb("#eaeaea"));
                 }
 
             }catch (err){
@@ -157,6 +157,7 @@ function Configurator () {
 
     const closeModal = () => {
         setIsModalOpen(false);
+
     };
 
 
@@ -287,7 +288,7 @@ function Configurator () {
         const names = colorConfig.colorName?.[textureIndex] ?? values;
         setActiveColorOptions({ values, names });
         setIsModelLoaded(true);
-    }, []);
+    }, [currentColorIndex]);
 
     const applyColor = useCallback(async (materialName, colorValues) => {
         //console.log(colorValues);
@@ -412,9 +413,11 @@ function Configurator () {
     // Update customization state and derived states (active colors)
     const handleOptionChange = useCallback((optionName, materialName, type, value) => {
         console.log(optionName, materialName, type, value)
+        console.log('handleOptionChange called:', { optionName, materialName, type, value });
         setCustomizations(prevCustoms => {
             const newCustoms = { ...prevCustoms };
             let newTextureIndex = textureIndex;
+
             if (optionName === 'texture_faasade') {
                 const textureConfig = isModel?.options?.['texture_faasade'];
                 if (textureConfig) {
@@ -424,23 +427,30 @@ function Configurator () {
                     if (colorConfig) {
                         updateActiveColors(newTextureIndex, colorConfig);
                         const newPalette = colorConfig.values?.[newTextureIndex] ?? [];
-                        const newDefaultColor = newPalette[0] ?? '#FFFFFF';
+                        const newDefaultColor = newPalette[0] ?? '#eaeaea';
                         if (newCustoms['color_faasade']) {
                             newCustoms['color_faasade'] = { ...newCustoms['color_faasade'], value: newDefaultColor };
+                            setCurrentColorIndex(0); // Сбрасываем индекс цвета при смене текстуры
                         }
                     }
                 }
-            };
-
+            } else if (optionName === 'color_faasade') {
+                // Обновляем индекс текущего цвета
+                const colorConfig = isModel?.options?.['color_faasade'];
+                const currentPalette = colorConfig?.values?.[textureIndex] ?? [];
+                const newColorIndex = currentPalette.indexOf(value);
+                if (newColorIndex >= 0) {
+                    setCurrentColorIndex(newColorIndex);
+                }
+            }
 
             newCustoms[optionName] = { materialName, type, value };
             updateShareableLink(newCustoms, productId);
             setScreenshotBlob(null);
-            setScreenshotBlob(null);
             return newCustoms;
         });
 
-    }, [isModel?.options, productId, updateShareableLink]);
+    }, [isModel?.options, productId, updateShareableLink, textureIndex, updateActiveColors]);
 
     useEffect(() => {
         const modelViewer =  modelViewerRef.current;
@@ -477,7 +487,7 @@ function Configurator () {
                             const texture = await modelViewer.createTexture(textureCust.value);
                             await modelViewer.updateComplete;
                             material.pbrMetallicRoughness.baseColorTexture.setTexture(texture);
-                            material.pbrMetallicRoughness.setBaseColorFactor([1, 1, 1, 1]);
+                            //material.pbrMetallicRoughness.setBaseColorFactor([1, 1, 1, 1]);
                             //console.log(material.clearcoatNormalScale)
                             //material.setClearcoatNormalScale(0)
                             //console.log(material.pbrMetallicRoughness)
@@ -501,7 +511,7 @@ function Configurator () {
 
                     }else { // Если текстура НЕ задана в customizations
                         if (material.pbrMetallicRoughness.baseColorTexture.texture) {
-                            material.pbrMetallicRoughness.baseColorTexture.setTexture(null); // Очищаем текстуру
+                            //material.pbrMetallicRoughness.baseColorTexture.setTexture(null); // Очищаем текстуру
                         }
                     }
                     /////apply color

@@ -20,10 +20,10 @@ function HomePage () {
     const [isHide, setHide] = useState(false);
     const modelViewerSliderRef = useRef();
     const [sliderModel, setSliderModel] = useState({
-        name: 'Chair',
-        src: '/models/1.glb',
+        name: 'Palma',
+        src: '/models/Palma.glb',
         poster: '/assets/img.png',
-        description: 'Сучасний стілець із ергономічним дизайном, ідеальний для дому чи офісу.'
+        description: 'Тумба Palma 80-2 з умивальником Vitold 800 торгової марки Fancy Marble.'
     });
 
     const initialTexture =   async (viewer, materialName , initialCustomizations , textureValue , load = () => {}) =>{
@@ -102,7 +102,7 @@ function HomePage () {
 
     // Нова функція для переключення моделей у слайдері
     const switchSrc = (name) => {
-        const base = `../../assets/ShopifyModels/${name}`;
+        const base = `../../models/${name}`;
         setSliderModel({
             name,
             src: `${base}.glb`,
@@ -133,7 +133,7 @@ function HomePage () {
     if (!isModel) return <div>Не вдалося завантажити дані моделі.</div>;
 
     return (
-        <div class="wrapper">
+        <div class="wrapper wrapper-home-page">
             <div className={`viewer-container-overlay`}>
                 {!isModelLoaded && (
                     <div className="loading-overlay">
@@ -187,11 +187,11 @@ function HomePage () {
                         <div className="slider">
                             <div className="slides">
                                 {[
-                                    { name: 'Chair', poster: '/assets/img.png' },
-                                    { name: 'Mixer', poster: '/assets/img.png' },
-                                    { name: 'GeoPlanter', poster: '/assets/img.png' },
-                                    { name: 'ToyTrain', poster: '/assets/img.png' },
-                                    { name: 'Canoe', poster: '/assets/img.png' }
+                                    { name: 'Palma', poster: '/assets/1_SideView.jpg' },
+                                    { name: 'Burry', poster: '/assets/BARY1.jpg' },
+                                    { name: 'Edge', poster: '/assets/Edgem1.jpg' },
+                                    { name: 'Mill', poster: '/assets/mill1000.jpg' },
+                                    { name: 'Vivara', poster: '/assets/J1250_1.jpg' }
                                 ].map((model) => (
                                     <button
                                         key={model.name}

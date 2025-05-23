@@ -121,7 +121,9 @@ body {
   position: absolute;
   inset: 0;
   border-radius: 8px;
-  overflow: hidden;
+}
+.wrapper-home-page .viewer-container-overlay {
+  z-index: -1;
 }
 
 .model-viewer-element {

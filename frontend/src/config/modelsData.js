@@ -29,22 +29,22 @@ export const modelsConfig = {
             "color_faasade": {
                 type: "color",
                 materialName: "faasade",
-                defaultValue: "#ffb000",
+                defaultValue: "#e7e7e7",
                 colorName: [
-                    ['Білий', 'Антрацит', 'білий глянсoвий', 'білий матовий'],
+                    ['Білий', 'Антрацит'],
                     ['графіт матовий', 'білий глянсoвий', 'Антрацит', 'Білий']
                 ],
                 values: [
-                    ['#ffb000', '#d40000', '#00ff77', '#6c2d2d'],
-                    ['#c79e9e', '#333232', '#9a6b23', '#ffb000']
+                    ['#efefef', '#333333'],
+                    ['#4B4B4B', '#333232', '#f9f9f9', '#333333']
                 ]
             },
             'texture_faasade': {
                 type: 'texture',
                 materialName: 'faasade',
-                defaultValue: '/models/textures/img.png',
+                defaultValue: '/models/textures/default.jpg',
                 values: [
-                    { name: 'Світле Дерево', path: '/models/textures/img.png' },
+                    { name: 'Світле Дерево', path: '/models/textures/default.jpg' },
                     { name: 'Темний Мармур', path: '/models/textures/wood.png' }
                 ]
             }
@@ -57,51 +57,163 @@ export const modelsConfig = {
             "color_faasade": {
                 type: "color",
                 materialName: "faasade",
-                defaultValue: "#ffb000",
+                defaultValue: "#e7e7e7",
                 colorName: [
-                        ['Білий', 'Антрацит', 'білий глянсoвий', 'білий матовий'],
-                        ['графіт матовий', 'білий глянсoвий', 'Антрацит', 'Білий']
+                    ['Білий', 'Антрацит'],
+                    ['графіт матовий', 'білий глянсoвий', 'Антрацит', 'Білий']
                 ],
                 values: [
-                        ['#ffb000', '#d40000', '#00ff77', '#6c2d2d'],
-                        ['#c79e9e', '#333232', '#9a6b23', '#ffb000']
+                    ['#efefef', '#333333'],
+                    ['#4B4B4B', '#333232', '#f9f9f9', '#333333']
                 ]
             },
             'texture_faasade': {
                 type: 'texture',
                 materialName: 'faasade',
-                defaultValue: '/models/textures/paper-txtr.jpg',
+                defaultValue: '/models/textures/default.jpg',
                 values: [
-                    { name: 'Світле Дерево', path: '/models/textures/paper-txtr.jpg' },
-                    { name: 'Темний Мармур', path: '/models/textures/img.png' }
+                    { name: 'Світле Дерево', path: '/models/textures/default.jpg' },
+                    { name: 'Темний Мармур', path: '/models/textures/SM-272.jpg' }
                 ]
             }
         }
     },
-    'fiji-83-2-Б-An_id':{
+    'palma':{
         name: "Suspended_cabinet",
-        path: "/models/1_2_fix_object.glb",
+        path: "/models/Palma.glb",
         options: {
             "color_faasade": {
                 type: "color",
                 materialName: "faasade",
-                defaultValue: "#ffb000",
+                defaultValue: "#e7e7e7",
                 colorName: [
-                    ['Білий', 'Антрацит', 'білий глянсoвий', 'білий матовий'],
+                    ['Білий', 'Антрацит'],
                     ['графіт матовий', 'білий глянсoвий', 'Антрацит', 'Білий']
                 ],
                 values: [
-                    ['#ffb000', '#d40000', '#00ff77', '#6c2d2d'],
-                    ['#c79e9e', '#333232', '#9a6b23', '#ffb000']
+                    ['#efefef', '#333333'],
+                    ['#4B4B4B', '#333232', '#f9f9f9', '#333333']
                 ]
             },
             'texture_faasade': {
                 type: 'texture',
                 materialName: 'faasade',
-                defaultValue: '/models/textures/paper-txtr.jpg',
+                defaultValue: '/models/textures/SM-272.jpg',
                 values: [
-                    { name: 'Світле Дерево', path: '/models/textures/paper-txtr.jpg' },
-                    { name: 'Темний Мармур', path: '/models/textures/img.png' }
+                    { name: 'ДСП', path: '/models/textures/default.jpg' },
+                    { name: 'МДФ', path: '/models/textures/SM-272.jpg' }
+                ]
+            }
+        }
+    },
+    'burry':{
+        name: "Suspended_cabinet",
+        path: "/models/Burry.glb",
+        options: {
+            "color_faasade": {
+                type: "color",
+                materialName: "faasade",
+                defaultValue: "#e7e7e7",
+                colorName: [
+                    ['Білий', 'Антрацит'],
+                    ['графіт матовий', 'білий глянсoвий', 'Антрацит', 'Білий']
+                ],
+                values: [
+                    ['#efefef', '#333333'],
+                    ['#4B4B4B', '#333232', '#f9f9f9', '#333333']
+                ]
+            },
+            'texture_faasade': {
+                type: 'texture',
+                materialName: 'faasade',
+                defaultValue: '/models/textures/default.jpg',
+                values: [
+                    { name: 'Світле Дерево', path: '/models/textures/default.jpg' },
+                    { name: 'Темний Мармур', path: '/models/textures/SM-272.jpg' }
+                ]
+            }
+        }
+    },
+    'edge':{
+        name: "Suspended_cabinet",
+        path: "/models/Edge.glb",
+        options: {
+            "color_faasade": {
+                type: "color",
+                materialName: "faasade",
+                defaultValue: "#e7e7e7",
+                colorName: [
+                    ['Білий', 'Антрацит'],
+                    ['графіт матовий', 'білий глянсoвий', 'Антрацит', 'Білий']
+                ],
+                values: [
+                    ['#efefef', '#333333'],
+                    ['#4B4B4B', '#333232', '#f9f9f9', '#333333']
+                ]
+            },
+            'texture_faasade': {
+                type: 'texture',
+                materialName: 'faasade',
+                defaultValue: '/models/textures/default.jpg',
+                values: [
+                    { name: 'Світле Дерево', path: '/models/textures/default.jpg' },
+                    { name: 'Темний Мармур', path: '/models/textures/SM-272.jpg' }
+                ]
+            }
+        }
+    },
+    'mill':{
+        name: "Suspended_cabinet",
+        path: "/models/Mill.glb",
+        options: {
+            "color_faasade": {
+                type: "color",
+                materialName: "faasade",
+                defaultValue: "#e7e7e7",
+                colorName: [
+                    ['Білий', 'Антрацит'],
+                    ['графіт матовий', 'білий глянсoвий', 'Антрацит', 'Білий']
+                ],
+                values: [
+                    ['#efefef', '#333333'],
+                    ['#4B4B4B', '#333232', '#f9f9f9', '#333333']
+                ]
+            },
+            'texture_faasade': {
+                type: 'texture',
+                materialName: 'faasade',
+                defaultValue: '/models/textures/default.jpg',
+                values: [
+                    { name: 'Світле Дерево', path: '/models/textures/default.jpg' },
+                    { name: 'Темний Мармур', path: '/models/textures/SM-272.jpg' }
+                ]
+            }
+        }
+    },
+    'vivara':{
+        name: "Suspended_cabinet",
+        path: "/models/Vivara.glb",
+        options: {
+            "color_faasade": {
+                type: "color",
+                materialName: "faasade",
+                defaultValue: "#e7e7e7",
+                colorName: [
+                    ['Білий', 'Антрацит'],
+                    ['графіт матовий', 'білий глянсoвий', 'Антрацит', 'Білий']
+                ],
+                values: [
+                    ['#efefef', '#333333'],
+                    ['#4B4B4B', '#333232', '#f9f9f9', '#333333']
+                ]
+            },
+            'texture_faasade': {
+                type: 'texture',
+                materialName: 'faasade',
+                defaultValue: '/models/textures/SM-272.jpg',
+                values: [
+                    { name: 'МДФ', path: '/models/textures/SM-272.jpg' },
+                    { name: 'ШПОН', path: '/models/textures/SM-308.jpg' }
                 ]
             }
         }

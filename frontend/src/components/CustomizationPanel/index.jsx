@@ -1,5 +1,5 @@
 import React from 'react';
-
+import { useState } from 'react';
 
 function CustomizationPanel({
                                 modelOptions,
@@ -10,12 +10,19 @@ function CustomizationPanel({
                                 disabled = false
                             }) {
 
+
     const textureConfig = modelOptions?.texture_faasade;
     const colorConfig = modelOptions?.color_faasade;
 
 
+    const [localSelection, setLocalSelection] = useState(currentSelections);
+
     const handleRadioChange = (optionName, materialName, type, value) => {
         if (!disabled) {
+            setLocalSelection(prev => ({
+                ...prev,
+                [optionName]: { materialName, value }
+            }));
             onOptionChange(optionName, materialName, type, value);
         }
     };
@@ -30,7 +37,7 @@ function CustomizationPanel({
                     <div className="options-container texture-options">
                         {textureConfig.values.map((textureOption, index) => {
                             const id = `texture-option-${index}`;
-                            const isSelected = currentSelections.texture_faasade?.value === textureOption.path;
+                            const isSelected = localSelection.texture_faasade?.value === textureOption.path;
                             return (
                                 <div className="option-item-texture" key={id}>
                                     <input
