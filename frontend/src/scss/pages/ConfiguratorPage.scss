@@ -1,0 +1,161 @@
+// ConfiguratorPage.scss
+@import "../abstracts/variables"; // Ваши переменные
+@import "../base/resset";       // Ваш сброс (если он нужен здесь, а не глобально)
+@import "../base/base";         // Ваши базовые стили (если нужны здесь)
+// @import "../components/buttons"; // Если кнопки используются только здесь
+// @import "../components/forms";   // Если формы используются только здесь
+// @import "../components/modal";   // Если модалка используется только здесь
+
+// --- Стили, специфичные для страницы Конфигуратора ---
+// (Копируем сюда очищенные стили для .configurator-container-overlay,
+// .viewer-container-overlay, .model-viewer-element, .loading-overlay,
+// .progress-bar, .update-bar, .panel-container-overlay из предыдущего ответа)
+
+.configurator-container-overlay {
+  position: relative;
+  width: 100%;
+  height: 85vh;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  background-color: $viewer-background;
+  font-family: $configurator-font-family;
+}
+
+.viewer-container-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.model-viewer-element {
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
+  &.loading {
+    opacity: 0.7;
+  }
+  &.hide {
+    transition: height 0.5s ease, opacity 0.5s ease, width 0.5s ease;
+    height: 0;
+    width: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+}
+
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: $loading-overlay-background;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  font-size: 1.2em;
+  color: $text-color-dark;
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+.progress-bar {
+  display: block;
+  width: 100%;
+  height: 4px;
+  background-color: rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: 11;
+  opacity: 1;
+  transition: opacity 0.4s 0.5s;
+}
+.model-viewer-element.loaded > .progress-bar {
+  opacity: 0;
+  pointer-events: none;
+}
+.update-bar {
+  width: 0%;
+  height: 100%;
+  background-color: $progress-bar-fill-color;
+  transition: width 0.1s;
+}
+
+.panel-container-overlay {
+  position: absolute;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: $panel-max-width;
+  z-index: 20;
+  background-color: $panel-overlay-background;
+  backdrop-filter: blur($panel-overlay-blur);
+  -webkit-backdrop-filter: blur($panel-overlay-blur);
+  border-radius: $panel-border-radius;
+  box-shadow: $panel-overlay-shadow;
+  transition: opacity 0.3s ease, transform 0.3s ease, max-height 0.3s ease;
+  max-height: 70vh;
+  overflow-y: auto;
+  &.panel-loading {
+    opacity: 0.8;
+    pointer-events: none;
+  }
+  &.collapsed {
+    max-height: 50px;
+    overflow: hidden;
+    padding: 0;
+  }
+}
+
+// --- Стили для сообщений (статус/ошибка) ---
+// Эти стили могут быть глобальными или специфичными для страницы
+.status-message {
+  padding: 20px;
+  text-align: center;
+  font-size: 1.1em;
+  border-radius: 6px;
+  margin: 20px auto; // Центрируем, если они отдельные блоки
+  max-width: $panel-max-width; // Чтобы не были слишком широкими
+}
+.error-message {
+  color: $error-color-text;
+  background-color: $error-color-background;
+  border: 1px solid $error-color-border;
+}
+
+// --- Адаптивность для страницы Конфигуратора ---
+@media (max-width: 768px) {
+  .configurator-container-overlay {
+    height: 90vh;
+  }
+  .panel-container-overlay {
+    width: 95%;
+    max-width: none;
+    bottom: 10px;
+    padding: 10px;
+    max-height: 45vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .panel-container-overlay {
+    bottom: 5px;
+    max-height: 40vh;
+  }
+}
+
+// Анимации (если они используются только на этой странице)
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}

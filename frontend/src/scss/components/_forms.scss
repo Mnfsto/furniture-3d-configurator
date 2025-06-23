@@ -1,0 +1,114 @@
+// _forms.scss
+@import "../abstracts/variables";
+
+.form { // Общий класс для форм
+  &-join { // Специфичная форма .form-join
+    max-width: 460px;
+    padding: 60px;
+    background-color: $accent; // Пример фона, если нужен
+    border-radius: 8px;
+
+    @media screen and (max-width: 440px) {
+      // max-width: 400px; // Не нужно, если родитель ограничивает
+      padding: 30px; // Уменьшаем паддинг
+    }
+    .button { // Стили для кнопки ВНУТРИ .form-join
+      color: white;
+      background-color: $accentLight; // $accentLight = #001328
+      border-color: $accentLight;
+      &:hover {
+        background-color: lighten($accentLight, 10%);
+      }
+    }
+  }
+
+  &__label {
+    display: block;
+    color: $LightGrey; // $LightGrey = #f8f8f8, очень светлый для белого фона
+    // Возможно, нужен $text-color-medium или $accentDark
+    font-size: 1.1em; // Уменьшил
+    padding: 0 0 5px 0; // Отступ снизу
+  }
+
+  &__input {
+    width: 100%; // Занять всю ширину
+    height: 40px;
+    display: block;
+    padding: 8px 12px; // Стандартные паддинги
+    margin-bottom: 20px;
+    font-size: 1em;
+    color: $text-color-dark; // Темный текст
+    border: 1px solid #ced4da; // Стандартная рамка
+    border-radius: 4px;
+    background-color: white; // Белый фон
+    // background-color: $accentLight; // Было $accentLight = #001328, очень темный фон
+
+    &:focus {
+      border-color: $progress-bar-fill-color; // Цвет фокуса
+      outline: 0;
+      box-shadow: 0 0 0 0.2rem rgba(blue($progress-bar-fill-color), green($progress-bar-fill-color), blue($progress-bar-fill-color), .25);
+    }
+  }
+
+  // &__button - это общий .button, стилизуется там
+
+  &__content { // Текст внутри формы
+    margin: 20px 0;
+    color: $LightGrey; // Опять же, очень светлый для белого фона
+    text-align: justify;
+  }
+}
+
+// Стили для форм внутри модального окна (если они отличаются)
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  h3 {
+    font-size: 1.3em;
+    margin-bottom: 10px;
+    color: $text-color-dark;
+  }
+  label {
+    font-weight: 500;
+    font-size: 0.9em;
+    color: $text-color-medium;
+  }
+  input[type="text"],
+  input[type="email"],
+  textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    box-sizing: border-box;
+    &:focus {
+      border-color: $progress-bar-fill-color;
+      outline: 0;
+      box-shadow: 0 0 0 0.2rem rgba(blue($progress-bar-fill-color), green($progress-bar-fill-color), blue($progress-bar-fill-color), .25);
+    }
+  }
+  textarea {
+    min-height: 80px;
+    resize: vertical;
+  }
+  // Кнопка отправки стилизуется через .modal-form button в _buttons.scss
+}
+
+.copy-link-url {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  font-size: 0.9em;
+  input[type="text"] {
+    flex-grow: 1;
+    padding: 8px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    background-color: #e9ecef;
+    font-size: 0.9em;
+    color: $text-color-medium;
+  }
+  // Кнопка .copy-link-button стилизуется в _buttons.scss
+}

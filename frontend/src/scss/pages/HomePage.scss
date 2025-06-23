@@ -1,0 +1,158 @@
+// HomePage.scss
+@import "../abstracts/variables"; // Если нужны
+// @import "../components/buttons"; // Если используются общие кнопки
+
+.homepage-container {
+  width: 100%;
+  min-height: 100vh;
+  background-color: $viewer-background; // Используем общую переменную
+  font-family: $configurator-font-family;
+  padding: 20px 0;
+}
+
+.hero-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  margin: 0 auto 40px auto; // Добавлен отступ снизу
+  max-width: 1200px;
+}
+
+.model-viewer-container { // Контейнер для model-viewer на главной
+  width: 100%;
+  max-width: 800px;
+  height: 500px;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative; // Для .loading-overlay и .progress-bar
+  background-color: #e0e0e0; // Фон на время загрузки
+}
+
+.model-viewer-hero { // Класс для самого <model-viewer> на главной
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
+  &.loading {
+    opacity: 0.7;
+  }
+  // Стили для .loading-overlay и .progress-bar можно сделать общими
+  // и импортировать или определить здесь, если они уникальны для этого вьювера.
+  // Я предполагаю, что они уже определены глобально или в ConfiguratorPage.scss
+  // и могут быть переиспользованы, если структура HTML похожа.
+  // Если нет, скопируйте их сюда.
+}
+
+.model-info {
+  text-align: center;
+  margin-top: 20px;
+  h1 {
+    font-size: 2em;
+    color: $text-color-dark;
+    margin-bottom: 15px;
+  }
+}
+
+// Кнопка .configure-button стилизуется в _buttons.scss или здесь, если уникальна
+.configure-button { // Если это уникальная кнопка для этой страницы
+  padding: 12px 24px;
+  background-color: $progress-bar-fill-color; // Пример
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.1em;
+  transition: background-color 0.2s, transform 0.2s;
+  &:hover:not(:disabled) {
+    background-color: darken($progress-bar-fill-color, 10%);
+    transform: scale(1.05);
+  }
+  &:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+  }
+}
+
+.bestsellers-section {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+  h2 {
+    font-size: 1.8em;
+    color: $text-color-dark;
+    text-align: center;
+    margin-bottom: 30px; // Увеличил отступ
+  }
+}
+
+.bestsellers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); // Увеличил minmax
+  gap: 25px; // Увеличил gap
+}
+
+.bestseller-card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  display: flex; // Для выравнивания контента
+  flex-direction: column;
+  &:hover {
+    transform: translateY(-5px); // Подъем при наведении
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+  }
+  &.selected { // Если есть логика выбора
+    border: 2px solid $progress-bar-fill-color;
+    box-shadow: 0 0 0 3px rgba(blue($progress-bar-fill-color), green($progress-bar-fill-color), blue($progress-bar-fill-color), 0.3);
+  }
+}
+
+.bestseller-image {
+  width: 100%;
+  height: 180px; // Увеличил высоту
+  object-fit: cover;
+  display: block;
+}
+
+.bestseller-card-content { // Контейнер для текста
+  padding: 15px;
+  text-align: center;
+  flex-grow: 1; // Занять оставшееся место
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; // Распределить пространство
+  h3 {
+    font-size: 1.1em;
+    color: $text-color-medium;
+    margin-bottom: 8px; // Меньше отступ
+  }
+  .bestseller-price { // Пример для цены
+    font-size: 1em;
+    font-weight: bold;
+    color: $text-color-dark;
+    margin-top: auto; // Прижать цену к низу, если есть другое описание
+  }
+}
+
+// Адаптивность для HomePage
+@media (max-width: 768px) {
+  .model-viewer-container { height: 400px; }
+  .model-info h1 { font-size: 1.5em; }
+  .bestsellers-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+  .bestseller-image { height: 140px; }
+}
+
+@media (max-width: 480px) {
+  .model-viewer-container { height: 300px; }
+  .hero-section { padding: 20px 10px; }
+  .bestsellers-section { margin: 20px auto; h2 { font-size: 1.5em; } }
+  .bestsellers-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); } // Можно сделать 1 или 2 колонки
+}

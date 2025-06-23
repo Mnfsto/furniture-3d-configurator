@@ -1,0 +1,154 @@
+// _buttons.scss
+@import "../abstracts/variables"; // Импорт переменных
+
+.button {
+  display: inline-block;
+  color: $accentDark;
+  padding: 15px 50px;
+  min-width: 100px;
+  border: 1px solid $accentDark;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color $duration ease-in-out, border-color $duration ease-in-out, color $duration ease-in-out, transform $duration ease-in-out;
+  background-color: transparent;
+  @include noselect;
+
+  &,
+  span {
+    color: $accentDark; // Убедитесь, что это не конфликтует с модификаторами
+    font-size: 1.3em; // Может быть слишком большим для некоторых контекстов
+  }
+
+  i,
+  span,
+  path,
+  svg {
+    transition: all $duration ease-in-out;
+  }
+
+  &:hover {
+    background-color: darken($primary, 5%); // $primary - это #e3e3e3, возможно, нужен другой цвет
+    // darken($secondLight, 8%) - было в оригинале, но $secondLight очень темный
+  }
+
+  &:active {
+    background-color: darken($secondary, 12%); // $secondary - тоже очень темный
+    transform: translateY(1px);
+  }
+
+  &--circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    padding: 0;
+    border-width: 2px;
+  }
+
+  &--black {
+    background-color: $accent; // $accent = #0D0D0D
+    color: white; // Добавим цвет текста для контраста
+    border-color: $accent;
+
+    &, span { color: white; }
+
+    &:hover,
+    &:active {
+      background-color: lighten($accent, 10%); // lighten($color: $secondary, $amount: 10) - было
+    }
+  }
+
+  &--outline {
+    background-color: #fff;
+    border-color: $accent;
+    &,
+    span {
+      color: $accent;
+    }
+
+    svg path { // Более точный селектор
+      fill: $accent;
+    }
+
+    &:hover {
+      background-color: $accent; // Было $secondLight
+      border-color: $accent;
+      &,
+      span {
+        color: #fff;
+      }
+      svg path {
+        fill: #fff;
+      }
+    }
+
+    &:active {
+      background-color: darken($accent, 8%); // Было darken($secondary, 8%)
+    }
+  }
+
+  // Модификаторы __delimiter, --add, --cart можно оставить, если они используются
+  // ...
+}
+
+// Стили для кнопок внутри конфигуратора (могут быть более специфичными)
+.submit-model-button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  background-color: $accentDark;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1em;
+  margin-top: 15px;
+  transition: background-color 0.2s, transform 0.2s;
+  &:hover:not(:disabled) {
+    background-color: lighten($accentDark, 10%);
+    transform: scale(1.02);
+  }
+  &:disabled {
+    background-color: $grey; // Используем $grey
+    cursor: not-allowed;
+  }
+}
+
+.copy-link-button {
+  padding: 8px 12px;
+  background-color: $progress-bar-fill-color;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9em;
+  white-space: nowrap;
+  transition: background-color 0.2s;
+  &:hover {
+    background-color: darken($progress-bar-fill-color, 10%);
+  }
+}
+
+.toggle-panel-button {
+  width: 35px;
+  height: 35px;
+  background-color: $progress-bar-fill-color;
+  color: white;
+  // ... (остальные стили из предыдущего ответа)
+}
+
+.modal-close-button {
+  width: 30px;
+  height: 30px;
+  background-color: #ef4444; // Красный
+  // ... (остальные стили из предыдущего ответа)
+}
+
+.modal-form button { // Кнопка отправки в модалке
+  width: 100%;
+  padding: 10px 15px;
+  background-color: $progress-bar-fill-color;
+  // ... (остальные стили из предыдущего ответа)
+}

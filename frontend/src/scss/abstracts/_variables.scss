@@ -1,0 +1,61 @@
+// _variables.scss
+
+// --- Colors ---
+$primary: #e3e3e3;
+$secondary: #540A06;
+$secondLight: #940F07; // Используется для старого .modal
+$grey: #88878F;
+$LightGrey: #f8f8f8; // Используется для .form__input
+$accentDark: #000000;
+$accent: #0D0D0D;
+$accentLight: #001328; // Используется для .form-join .button
+
+// Цвета из стилей Configurator/Panel (можно объединить или оставить для наглядности)
+$configurator-font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+$viewer-background: #f0f0f0;
+$panel-overlay-background: rgba(255, 255, 255, 0.9);
+$panel-overlay-blur: 5px;
+$panel-overlay-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+$panel-border-radius: 12px;
+$loading-overlay-background: rgba(255, 255, 255, 0.85);
+$progress-bar-fill-color: #3b82f6;
+$panel-max-width: 500px;
+
+$option-label-background: rgba(255, 255, 255, 0.5);
+$option-label-border-hover: #9ca3af;
+$option-label-border-checked: #3b82f6;
+$option-checkmark-color: rgba(255, 255, 255, 0.9);
+$option-checkmark-shadow: rgba(0, 0, 0, 0.6);
+
+$text-color-dark: #111827;
+$text-color-medium: #374151;
+$text-color-light: #4b5563;
+$border-color-light: rgba(0, 0, 0, 0.1);
+
+$error-color-text: #a94442;
+$error-color-background: #f2dede;
+$error-color-border: #ebccd1;
+
+// --- Fonts ---
+// (Перенесите сюда ваши переменные $headingX1, $title15 и т.д. из раздела Fonts)
+// $headingX1: 2rem "Futura", sans-serif;
+// $title15: 0.9375rem "Lato", sans-serif;
+// ... и остальные ...
+// $textshadow: 1px 6px 10px rgba(35, 31, 32, 0.20), 0px 1px 10px rgba(35, 31, 32, 0.21);
+
+// --- Layout ---
+$container-width: 90%; // Используется в старых стилях, возможно, не нужен
+$max-width-wrapper: 1400px; // Для общего .wrapper
+
+// --- Transitions ---
+$duration: 0.15s;
+
+// --- Mixins ---
+@mixin noselect {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}

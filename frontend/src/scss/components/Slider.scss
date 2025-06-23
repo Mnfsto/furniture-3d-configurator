@@ -1,0 +1,175 @@
+//// Slider.scss
+//@import "../abstracts/variables"; // Если нужны
+//
+//.slider-container {
+//  max-width: 1440px;
+//  margin: 20px auto; // Добавил отступы сверху/снизу
+//  background-color: #e0e0e0; // Сделал чуть светлее, чем #dadada
+//  border-radius: 8px;
+//  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+//  padding-bottom: 20px; // Отступ для слайдов и информации
+//
+//  .contact-info {
+//    padding: 20px 25px; // Увеличил боковые отступы
+//    font-size: 1em;
+//    color: $text-color-medium;
+//    p {
+//      margin: 10px 0;
+//      line-height: 1.6;
+//      a { // Ссылки внутри contact-info
+//        color: $progress-bar-fill-color;
+//        text-decoration: none;
+//        &:hover {
+//          text-decoration: underline;
+//          color: darken($progress-bar-fill-color, 10%);
+//        }
+//      }
+//    }
+//  }
+//
+//  // Скрытие неинициализированных элементов <model-viewer>
+//  :not(:defined) > * {
+//    display: none;
+//  }
+//
+//  model-viewer.model-viewer-slider { // Класс для <model-viewer> внутри слайдера
+//    width: 100%;
+//    height: 50vh; // Можно сделать настраиваемым
+//    min-height: 350px; // Минимальная высота
+//    background-color: #f5f5f5; // Светлый фон для самого вьювера
+//    border-top-left-radius: 8px; // Скругление верхних углов
+//    border-top-right-radius: 8px;
+//    // overflow-x: hidden; // Не нужен, т.к. overflow у родителя
+//  }
+//
+//  // AR кнопка и промпты (оставляю ваши стили, т.к. они специфичны)
+//  #ar-button {
+//    background-repeat: no-repeat;
+//    background-size: 20px 20px;
+//    background-position: 12px 50%;
+//    background-color: #fff;
+//    position: absolute;
+//    left: 50%;
+//    transform: translateX(-50%);
+//    white-space: nowrap;
+//    bottom: 132px; // Может потребоваться адаптация
+//    padding: 0px 16px 0px 20px;
+//    font-family: Roboto, Helvetica Neue, sans-serif;
+//    font-size: 14px;
+//    color: $accentDark;
+//    height: 36px;
+//    line-height: 36px;
+//    border-radius: 18px;
+//    border: 1px solid #DADCE0;
+//    &:active { background-color: #E8EAED; }
+//    &:focus { outline: none; }
+//    &:focus-visible { outline: 1px solid #4285f4; }
+//  }
+//
+//  // ... (остальные стили для #ar-prompt, #ar-failure, анимации circle, elongate) ...
+//  // ... Я их немного сокращу для примера, но вы можете оставить свои ...
+//  model-viewer > #ar-prompt {
+//    position: absolute; left: 50%; bottom: 175px;
+//    animation: elongate 2s infinite ease-in-out alternate; display: none;
+//    img { animation: circle 4s linear infinite; }
+//  }
+//  model-viewer[ar-status="session-started"] > #ar-prompt { display: block; }
+//  model-viewer > #ar-failure {
+//    position: absolute; left: 50%; transform: translateX(-50%); bottom: 175px; display: none;
+//  }
+//  model-viewer[ar-tracking="not-tracking"] > #ar-failure { display: block; }
+//
+//
+//  .slider { // Контейнер для .slides
+//    width: 100%;
+//    text-align: center;
+//    overflow: hidden;
+//    position: relative; // Изменил с absolute, чтобы не перекрывать contact-info
+//    padding: 10px 0; // Отступы для слайдов
+//  }
+//
+//  .slides {
+//    display: flex;
+//    overflow-x: auto;
+//    scroll-snap-type: x mandatory;
+//    scroll-behavior: smooth;
+//    -webkit-overflow-scrolling: touch;
+//    padding: 10px 0 10px 10px; // Отступ слева и для скроллбара
+//    margin-left: -10px; // Компенсация левого отступа для выравнивания
+//    &::-webkit-scrollbar { height: 8px; } // Стилизация скроллбара
+//    &::-webkit-scrollbar-thumb { background: #bbb; border-radius: 4px; }
+//    &::-webkit-scrollbar-track { background: #f0f0f0; border-radius: 4px; }
+//  }
+//
+//  .slide { // Одна превьюшка в слайдере
+//    scroll-snap-align: start;
+//    flex-shrink: 0;
+//    width: 100px;
+//    height: 100px;
+//    background-size: cover; // cover лучше, чем contain, если пропорции разные
+//    background-repeat: no-repeat;
+//    background-position: center;
+//    background-color: #fff;
+//    margin-right: 15px; // Увеличил отступ
+//    border-radius: 10px;
+//    border: 2px solid transparent; // Рамка для selected
+//    cursor: pointer;
+//    transition: border-color 0.2s, transform 0.2s;
+//    &:last-child { margin-right: 10px; } // Чтобы последний слайд не прилипал
+//    &:hover {
+//      transform: scale(1.05);
+//    }
+//    &.selected {
+//      border-color: $progress-bar-fill-color; // Используем основной цвет акцента
+//      box-shadow: 0 0 0 2px rgba(blue($progress-bar-fill-color), green($progress-bar-fill-color), blue($progress-bar-fill-color), 0.3);
+//    }
+//    &:focus { outline: none; }
+//    &:focus-visible { outline: 2px solid $progress-bar-fill-color; outline-offset: 1px; }
+//  }
+//
+//  .model-info { // Информация о модели под слайдером (если есть)
+//    text-align: center; // Центрируем
+//    padding: 15px 20px;
+//    // bottom: 20px; // Убрал, т.к. теперь в потоке
+//  }
+//
+//  // Кнопка .configure-button стилизуется в _buttons.scss
+//  // или здесь, если она уникальна для слайдера.
+//  // .configure-button { ... }
+//
+//  // Анимация заголовка (если она именно для слайдера)
+//  .title_animation {
+//    margin: 30px 0 20px 0; // Изменил отступы
+//    font-weight: 700;
+//    text-align: center;
+//    font-size: 2.5em; // Адаптируйте
+//    font-family: 'Hack', monospace; // Указал fallback
+//    text-transform: uppercase;
+//    // ... (остальные стили для background-clip и анимации shine) ...
+//  }
+//}
+//
+//// Адаптивность для слайдера
+//@media (max-width: 940px) {
+//  .slider-container model-viewer.model-viewer-slider { height: 60vh; }
+//}
+//@media (max-width: 768px) {
+//  .slider-container model-viewer.model-viewer-slider { height: 50vh; min-height: 400px; }
+//  .slider-container .slide { width: 80px; height: 80px; }
+//  .slider-container .title_animation { font-size: 2em; }
+//}
+//@media (max-width: 480px) {
+//  .slider-container model-viewer.model-viewer-slider { height: 45vh; min-height: 300px; }
+//  .slider-container .slider { padding: 5px 0; }
+//  .slider-container .slides { padding-left: 5px; margin-left: -5px; }
+//  .slider-container .slide { width: 70px; height: 70px; margin-right: 8px; }
+//  .slider-container .title_animation { font-size: 1.8em; margin-top: 20px; }
+//}
+//
+//// Анимации (если еще не определены)
+//@keyframes shine {
+//  0% { background-position-x: -500%; }
+//  100% { background-position-x: 500%; }
+//}
+//@keyframes circle { /* ... */ }
+//@keyframes elongate { /* ... */ }

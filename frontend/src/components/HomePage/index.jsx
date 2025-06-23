@@ -26,12 +26,13 @@ function HomePage () {
         description: 'Тумба Palma 80-2 з умивальником Vitold 800 торгової марки Fancy Marble.'
     });
 
-    const initialTexture =   async (viewer, materialName , initialCustomizations , textureValue , load = () => {}) =>{
+    const initialTexture = async (viewer, materialName, initialCustomizations, textureValue, load = () => {
+    }) => {
         const modelViewer = viewer;
         console.log("Initial");
 
         const colorValue = initialCustomizations;
-        const texturePath  = textureValue;
+        const texturePath = textureValue;
 
         if (modelViewer.current) {
 
@@ -46,11 +47,11 @@ function HomePage () {
                 //  if(!modelViewer)return () => load(false)
 
                 const material = modelViewer.current.model?.materials[0]
-                const texture =  await modelViewer.current.createTexture(texturePath);
+                const texture = await modelViewer.current.createTexture(texturePath);
                 material.pbrMetallicRoughness.baseColorTexture.setTexture(texture);
                 material.pbrMetallicRoughness.setBaseColorFactor(hexToRgb(colorValue.defaultValue));
-            }catch (err){
-                console.error("WARRRRRNING",err);
+            } catch (err) {
+                console.error("WARRRRRNING", err);
             }
         }
 
@@ -66,7 +67,7 @@ function HomePage () {
         const cusomization = model.options['color_faasade'];
         const texturePath = model.options['texture_faasade'].defaultValue;
         const colorValue = model.defaultValue;
-        const animation = () =>{
+        const animation = () => {
             console.log("hideeeeeee")
             setHide(true);
         }
@@ -131,78 +132,49 @@ function HomePage () {
     if (loading) return <div>Завантаження...</div>;
     if (error) return <div className="error-message">Помилка: {error}</div>;
     if (!isModel) return <div>Не вдалося завантажити дані моделі.</div>;
-
     return (
-        <div class="wrapper wrapper-home-page">
-            <div className={`viewer-container-overlay`}>
-                {!isModelLoaded && (
-                    <div className="loading-overlay">
-                        Завантаження 3D моделі...
-                    </div>
-                )}
-                <model-viewer
-                    ref={(ref) => {
-                        modelViewerRef.current = ref;
-                    }}
-                    className={`model-viewer-element ${isModelLoaded ? 'loaded' : 'loading'}  ${isHide ? 'hide' : ''}`}
-                    id="myModelViewer"
-                    exposure="0.008"
-                    camera-controls
-                    key={isModel.path}
-                    src={isModel.path}
-                    slot="progress-bar"
-                    onLoad={handleModelLoad}
-                    onError={handleModelError}
-                    tone-mapping="neutral"
-                    shadow-intensity="1">
+        // <HomeHeader /> можно просто удалить из App.jsx или скрыть через CSS
+        <div className="wrapper wrapper-home-page">
+            {/* Основной контент сразу виден */}
+            <main className="homepage-main-content">
 
-                    <div slot="progress-bar" className="progress-bar">
-                        <div className="update-bar"></div>
-                    </div>
-                    <h1 className={"title_animation"}>Furniture Constructor</h1>
-                </model-viewer>
                 <div className="slider-container">
-
                     <model-viewer
                         ref={modelViewerSliderRef}
                         src={sliderModel.src}
-
                         shadow-intensity="1"
                         ar
                         camera-controls
                         touch-action="pan-y"
                         alt="A 3D model carousel"
-                        className="model-viewer-slider "
+                        className="model-viewer-slider"
                         exposure="0.008"
                     >
                         <button slot="ar-button" id="ar-button">
                             View in your space
                         </button>
-                        <div id="ar-prompt">
-                            <img src="/assets/img.png" alt="AR prompt hand" />
-                        </div>
-                        <button id="ar-failure">
-                            AR is not tracking!
-                        </button>
+                        {/*<div id="ar-prompt">*/}
+                        {/*    <img src="/assets/img.png" alt="AR prompt hand"/>*/}
+                        {/*</div>*/}
+                        <button id="ar-failure">AR is not tracking!</button>
                         <div className="slider">
                             <div className="slides">
                                 {[
-                                    { name: 'Palma', poster: '/assets/1_SideView.jpg' },
-                                    { name: 'Burry', poster: '/assets/BARY1.jpg' },
-                                    { name: 'Edge', poster: '/assets/Edgem1.jpg' },
-                                    { name: 'Mill', poster: '/assets/mill1000.jpg' },
-                                    { name: 'Vivara', poster: '/assets/J1250_1.jpg' }
+                                    {name: 'Palma', poster: '/assets/1_SideView.jpg'},
+                                    {name: 'Burry', poster: '/assets/BARY1.jpg'},
+                                    {name: 'Edge', poster: '/assets/Edgem1.jpg'},
+                                    {name: 'Mill', poster: '/assets/mill1000.jpg'},
+                                    {name: 'Vivara', poster: '/assets/J1250_1.jpg'}
                                 ].map((model) => (
                                     <button
                                         key={model.name}
                                         className={`slide ${sliderModel.name === model.name ? 'selected' : ''}`}
                                         onClick={() => switchSrc(model.name)}
-                                        style={{ backgroundImage: `url(${model.poster})` }}
+                                        style={{backgroundImage: `url(${model.poster})`}}
                                     />
                                 ))}
                             </div>
                         </div>
-
                     </model-viewer>
                     <div className="model-info">
                         <h1>{sliderModel.name}</h1>
@@ -217,18 +189,13 @@ function HomePage () {
                             Сконфігурувати модель
                         </button>
                         <div className="contact-info">
-                            <p>
-                                <a href="tel:+380123456789">+380 123 456 789</a>
-                            </p>
-                            <p>
-                                <a href="mailto:info@example.com">info@example.com</a>
-                            </p>
+                            <p><a href="tel:+380123456789">+380 123 456 789</a></p>
+                            <p><a href="mailto:info@example.com">info@example.com</a></p>
                         </div>
                     </div>
                 </div>
-            </div>
+            </main>
         </div>
     );
-};
-
+}
 export default HomePage;

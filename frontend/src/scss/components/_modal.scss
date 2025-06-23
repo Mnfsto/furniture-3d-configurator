@@ -1,0 +1,62 @@
+// _modal.scss
+@import "../abstracts/variables";
+
+// --- Общие стили для Модального Окна ---
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease-in-out;
+
+  &.active { // Класс для отображения
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+.modal-content {
+  background-color: white;
+  padding: 25px;
+  border-radius: $panel-border-radius; // Используем переменную
+  max-width: 450px; // Максимальная ширина
+  width: 90%; // На мобильных
+  position: relative;
+  box-shadow: $panel-overlay-shadow; // Используем переменную
+  transform: scale(0.95) translateY(10px); // Начальное состояние для анимации
+  opacity: 0;
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+
+  .modal-overlay.active & { // Анимация при появлении
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+// Кнопка закрытия (.modal-close-button) стилизуется в _buttons.scss
+
+.modal-selection-info {
+  margin-bottom: 20px;
+  font-size: 0.95em;
+  color: $text-color-medium;
+  p { margin: 8px 0; }
+  a {
+    color: $progress-bar-fill-color;
+    text-decoration: none;
+    word-break: break-all;
+    &:hover { text-decoration: underline; }
+  }
+  img {
+    max-width: 100px;
+    border-radius: 4px;
+    margin-top: 5px;
+    display: block; // Чтобы margin-top работал
+  }
+}
+
+// Форма внутри модалки (.modal-form) стилизуется в _forms.scss

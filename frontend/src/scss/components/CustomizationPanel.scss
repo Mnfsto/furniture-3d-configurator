@@ -1,0 +1,178 @@
+// CustomizationPanel.scss
+@import "../abstracts/variables"; // Импорт переменных, если они нужны здесь
+
+.customization-panel {
+  // Сюда больше не нужны background, padding, font-family, border, shadow, max-width, margin
+  // т.к. они заданы для .panel-container-overlay
+  &.disabled {
+    opacity: 0.8; // Можно оставить для дополнительного эффекта, если панель заблокирована
+  }
+}
+
+.panel-title {
+  font-size: 1.2em;
+  font-weight: 600;
+  color: $text-color-dark;
+  margin-bottom: 15px;
+  text-align: center;
+  border-bottom: 1px solid $border-color-light;
+  padding-bottom: 10px;
+}
+
+.option-group {
+  border: none;
+  padding: 0;
+  margin: 0 0 20px 0;
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.group-legend {
+  font-size: 1em;
+  font-weight: 500;
+  color: $text-color-medium;
+  margin-bottom: 12px;
+  padding: 0;
+  width: 100%;
+}
+
+.options-container {
+  display: grid;
+  gap: 10px;
+  justify-content: center;
+}
+
+.texture-options {
+  grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
+}
+
+.color-options {
+  grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
+}
+
+.option-item-texture,
+.option-item-color {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.option-radio-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.option-label {
+  display: inline-block;
+  border: 2px solid transparent;
+  padding: 2px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  background-color: $option-label-background;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.option-radio-input:not(:disabled) + .option-label:hover {
+  border-color: $option-label-border-hover;
+  transform: scale(1.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.option-radio-input:focus-visible + .option-label {
+  outline: 2px solid $progress-bar-fill-color;
+  outline-offset: 1px;
+  border-color: lighten($progress-bar-fill-color, 20%);
+}
+
+.option-radio-input:checked + .option-label {
+  border-color: $option-label-border-checked;
+  box-shadow: 0 0 0 2px rgba(blue($option-label-border-checked), green($option-label-border-checked), blue($option-label-border-checked), 0.4);
+}
+
+.texture-label {
+  width: 65px;
+  height: 65px;
+  padding: 0;
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+}
+
+.color-label {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  padding: 0;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.option-radio-input:checked + .color-label {
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15), 0 0 0 2px white, 0 0 0 4px $option-label-border-checked;
+  transform: scale(1.05);
+}
+.option-radio-input:not(:disabled) + .color-label:hover {
+  transform: scale(1.1);
+  border-color: transparent;
+}
+
+.selected-checkmark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: $option-checkmark-color;
+  font-size: 1.3em;
+  font-weight: bold;
+  text-shadow: 0 0 2px $option-checkmark-shadow;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease-in-out;
+}
+.option-radio-input:checked + .option-label .selected-checkmark {
+  opacity: 1;
+}
+.texture-label .selected-checkmark {
+  font-size: 1.6em;
+}
+
+.no-options-message {
+  color: $text-color-light;
+  font-style: italic;
+  width: 100%;
+  padding: 10px 0;
+  text-align: center;
+}
+
+// Стили для .actions-container, .submit-model-button, .copy-link-button, .copy-link-url
+// можно оставить здесь, если они используются ТОЛЬКО внутри CustomizationPanel.
+// Если они более общие, их лучше вынести в _buttons.scss или _forms.scss.
+// Для примера, оставлю их здесь, если они являются частью интерфейса панели.
+
+.actions-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+// Стили для .submit-model-button и .copy-link-button можно взять из _buttons.scss
+// если они соответствуют общему стилю кнопок.
+// Если они уникальны для панели, определите их здесь.
+
+// Адаптивность для самой панели (если нужна специфичная, отличная от .panel-container-overlay)
+@media (max-width: 480px) {
+  .panel-title { font-size: 1.1em; }
+  .group-legend { font-size: 0.9em; }
+  // ... и т.д.
+}

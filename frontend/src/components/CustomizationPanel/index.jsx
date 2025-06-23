@@ -1,66 +1,67 @@
 import React from 'react';
-import { useState } from 'react';
 
 function CustomizationPanel({
                                 modelOptions,
                                 currentSelections,
                                 onOptionChange,
-                                activeColorPalette,
-                                activeColorNames,
-                                disabled = false
+                                disabled = false,
+                                selectedPart,
+                                setSelectedPart,
+                                setTextureIndex,
+                                setCurrentTexturePath,
+                                setCurrentMaterial,
+                                updateActiveColors,
+                                setCurrentColorIndex,
                             }) {
 
-
-    const textureConfig = modelOptions?.texture_faasade;
-    const colorConfig = modelOptions?.color_faasade;
-
-
-    const [localSelection, setLocalSelection] = useState(currentSelections);
-
     const handleRadioChange = (optionName, materialName, type, value) => {
-        if (!disabled) {
-            setLocalSelection(prev => ({
-                ...prev,
-                [optionName]: { materialName, value }
-            }));
-            onOptionChange(optionName, materialName, type, value);
-        }
+        if (disabled) return;
+        const part = modelOptions.configurableParts.find((p) => p.key === selectedPart);
+        const oppositeKey = type === 'texture' ? part.colorOptionKey : part.textureOptionKey;
+        onOptionChange(optionName, materialName, type, value, oppositeKey);
     };
+
+    const handlePartChange = (partKey) => {
+        setSelectedPart(partKey);
+        // Не нужно вручную сбрасывать состояние, этим займется useEffect в Configurator
+    };
+
+    const partOptions = modelOptions.configurableParts.map((part) => ({
+        key: part.key,
+        name: part.displayName,
+        thumbnail: `/assets/part-thumbnails/${part.key}.jpg`,
+    }));
+
+    const part = modelOptions.configurableParts.find((p) => p.key === selectedPart);
+    const textureConfig = modelOptions.options[part?.textureOptionKey];
+    const colorConfig = modelOptions.options[part?.colorOptionKey];
+
+    const activeTextureValue = currentSelections[part?.textureOptionKey]?.value;
+    const activeColorValue = currentSelections[part?.colorOptionKey]?.value;
 
     return (
         <div className={`customization-panel ${disabled ? 'disabled' : ''}`}>
-
-
-            {textureConfig?.values && (
-                <fieldset className="option-group texture-group">
-                    <legend className="group-legend">{textureConfig.displayName || 'Текстура Матеріалу'}</legend>
-                    <div className="options-container texture-options">
-                        {textureConfig.values.map((textureOption, index) => {
-                            const id = `texture-option-${index}`;
-                            const isSelected = localSelection.texture_faasade?.value === textureOption.path;
+            {partOptions.length > 1 && (
+                <fieldset className="option-group part-group">
+                    <legend className="group-legend">Елемент</legend>
+                    <div className="options-container part-options">
+                        {partOptions.map((partOption) => {
+                            const id = `part-option-${partOption.key}`;
+                            const isSelected = selectedPart === partOption.key;
                             return (
-                                <div className="option-item-texture" key={id}>
+                                <div className="option-item-part" key={id}>
                                     <input
                                         type="radio"
                                         id={id}
-                                        name="texture_faasade_option"
-                                        value={textureOption.path}
+                                        name="part_option"
+                                        value={partOption.key}
                                         checked={isSelected}
-                                        onChange={() => handleRadioChange(
-                                            'texture_faasade',
-                                            textureConfig.materialName,
-                                            'texture',
-                                            textureOption.path
-                                        )}
+                                        onChange={() => handlePartChange(partOption.key)}
                                         disabled={disabled}
-                                        className="option-radio-input"
+                                        className="option-input"
                                     />
-                                    <label htmlFor={id} className="option-label texture-label" title={textureOption.name || textureOption.path}>
-                                        <img
-                                            src={textureOption.thumbnail || textureOption.path}
-                                            alt={textureOption.name || 'Текстура'}
-                                            loading="lazy"
-                                        />
+                                    <label htmlFor={id} className="option-label part-label" title={partOption.name}>
+                                        <img src={partOption.thumbnail} alt={partOption.name} loading="lazy" />
                                         {isSelected && <span className="selected-checkmark">✔</span>}
                                     </label>
                                 </div>
@@ -70,49 +71,83 @@ function CustomizationPanel({
                 </fieldset>
             )}
 
-            {/* --- Выбор Цвета --- */}
-            {colorConfig && activeColorPalette && (
-                <fieldset className="option-group color-group">
-                    <legend className="group-legend">{colorConfig.displayName || 'Колір Матеріалу'}</legend>
-                    {activeColorPalette.length > 0 ? (
-                        <div className="options-container color-options">
-                            {activeColorPalette.map((colorValue, index) => {
-                                const colorName = activeColorNames?.[index] ?? colorValue;
-                                const id = `color-option-${index}-${colorValue.replace('#','')}`;
-                                const isSelected = currentSelections.color_faasade?.value === colorValue;
-                                return (
-                                    <div className="option-item-color" key={id}>
-                                        <input
-                                            type="radio"
-                                            id={id}
-                                            name="color_faasade_option"
-                                            value={colorValue}
-                                            checked={isSelected}
-                                            onChange={() => handleRadioChange(
-                                                'color_faasade',
-                                                colorConfig.materialName,
+            {(textureConfig?.values || colorConfig?.values) && (
+                <fieldset className="option-group material-group">
+                    <legend className="group-legend">Матеріал</legend>
+                    <div className="options-container material-options">
+                        {textureConfig?.values?.map((textureOption, index) => {
+                            const id = `texture-option-${part.key}-${index}`;
+                            const isSelected = activeTextureValue === textureOption.path;
+                            return (
+                                <div className="option-item-texture" key={id}>
+                                    <input
+                                        type="radio"
+                                        id={id}
+                                        name={`material_${part.key}`}
+                                        value={textureOption.path}
+                                        checked={isSelected}
+                                        onChange={() =>
+                                            handleRadioChange(
+                                                part.textureOptionKey,
+                                                part.materialName,
+                                                'texture',
+                                                textureOption.path
+                                            )
+                                        }
+                                        disabled={disabled}
+                                        className="option-input"
+                                    />
+                                    <label
+                                        htmlFor={id}
+                                        className="option-label material-label texture-label"
+                                        title={textureOption.name}
+                                    >
+                                        <img
+                                            src={textureOption.thumbnail || textureOption.path}
+                                            alt={textureOption.name}
+                                            loading="lazy"
+                                        />
+                                        {isSelected && <span className="selected-checkmark">✔</span>}
+                                    </label>
+                                </div>
+                            );
+                        })}
+                        {colorConfig?.values?.map((colorValue, index) => {
+                            const colorName = colorConfig.colorName?.[index] ?? colorValue;
+                            const id = `color-option-${part.key}-${index}`;
+                            const isSelected = activeColorValue === colorValue;
+                            return (
+                                <div className="option-item-color" key={id}>
+                                    <input
+                                        type="radio"
+                                        id={id}
+                                        name={`material_${part.key}`}
+                                        value={colorValue}
+                                        checked={isSelected}
+                                        onChange={() =>
+                                            handleRadioChange(
+                                                part.colorOptionKey,
+                                                part.materialName,
                                                 'color',
                                                 colorValue
-                                            )}
-                                            disabled={disabled}
-                                            className="option-radio-input"
-                                        />
-                                        <label
-                                            htmlFor={id}
-                                            className="option-label color-label"
-                                            title={colorName}
-                                            style={{ backgroundColor: colorValue }}
-                                            aria-label={`Вибрати колір ${colorName}`}
-                                        >
-                                            {isSelected && <span className="selected-checkmark">✔</span>}
-                                        </label>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    ) : (
-                        <p className="no-options-message">Немає доступних кольорів для вибраної текстури.</p>
-                    )}
+                                            )
+                                        }
+                                        disabled={disabled}
+                                        className="option-input"
+                                    />
+                                    <label
+                                        htmlFor={id}
+                                        className="option-label material-label color-label"
+                                        title={colorName}
+                                        style={{ backgroundColor: colorValue }}
+                                        aria-label={`Колір ${colorName}`}
+                                    >
+                                        {isSelected && <span className="selected-checkmark">✔</span>}
+                                    </label>
+                                </div>
+                            );
+                        })}
+                    </div>
                 </fieldset>
             )}
         </div>

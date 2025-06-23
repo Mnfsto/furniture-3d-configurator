@@ -1,0 +1,47 @@
+// _base.scss
+
+// Глобальный box-sizing
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px; // Базовый размер шрифта
+}
+
+body {
+  background-color: white; // Или $viewer-background, если это основной фон
+  font-family: $configurator-font-family; // Используем общую переменную для шрифта по умолчанию
+  line-height: 1.5; // Базовая высота строки
+  color: $text-color-dark; // Базовый цвет текста
+  margin: 0; // Убедимся, что нет отступов у body
+}
+
+// Стили для ссылок (если нужны глобально)
+a {
+  color: $progress-bar-fill-color; // Пример использования цвета акцента
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// Стили для списков (если нужны глобально)
+ul, ol {
+  list-style: none; // Уже есть в вашем resset, но можно продублировать для ясности
+  padding: 0;
+  margin: 0;
+}
+
+// Перенесите сюда определения для h1-h5, p, li из вашего старого файла,
+// если хотите, чтобы они были глобальными. Но будьте осторожны с этим,
+// лучше стилизовать их по месту или через более специфичные классы.
+// Пример:
+// h1, h2, h3, h4, h5 {
+//   font-family: "Futura", sans-serif; // Пример
+//   font-weight: bold;
+//   margin-bottom: 0.5em;
+// }
+// p {
+//   margin-bottom: 1em;
+// }

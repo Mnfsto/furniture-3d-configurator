@@ -56,30 +56,54 @@ const setupServer = (port) => {
     app.post('/api/submit', upload.single('screenshot'), async (req, res) => {
         try {
             console.log('Отримано дані:', req.body, 'Файл:', req.file);
-            const { name, phone, email, comment, model, color, material, shareableLink } = req.body;
+            const { name, phone, email, comment, model, shareableLink } = req.body;
             const screenshot = req.file;
 
-            if (!name || !phone || !email || !model || !color || !material || !shareableLink || !screenshot) {
-                console.error('Відсутні обов’язкові поля:', { name, phone, email, model, color, material, shareableLink, screenshot });
+            if (!name || !phone || !email || !model || !shareableLink || !screenshot) {
+                console.error('Відсутні обов’язкові поля:', { name, phone, email, model, shareableLink, screenshot });
                 return res.status(400).send('Усі поля та скріншот є обов’язковими.');
             }
+            let customizationDetails = [];
+
+            for (const key in req.body) {
+                if (key.endsWith('_material')) {
+                    const partName = key.replace('_material', '');
+                    const capitalizedPartName = partName.charAt(0).toUpperCase() + partName.slice(1);
+                    customizationDetails.push(`${capitalizedPartName} (Матеріал): ${req.body[key]}`);
+                } else if (key.endsWith('_color')){
+                    const partName = key.replace('_color', '');
+                    const capitalizedPartName = partName.charAt(0).toUpperCase() + partName.slice(1);
+                    customizationDetails.push(`${capitalizedPartName} (Колір): ${req.body[key]}`);
+                }
+
+            }
+
+            const customizationText = customizationDetails.length > 0 ? customizationDetails.join('\n- ') : 'Не вказано';
 
             const client = new postmark.ServerClient(process.env.POSTMORT_API_KEY);
 
             const mailToOwner = {
                 "From": process.env.SMTP_USER,
                 "To": process.env.SMTP_USER,
-                "Subject": `Новий запит від ${name}`,
+                "Subject": `Новий запит на конфігурацію: ${model}`,
                 "TextBody": `
-        Ім'я: ${name}
-        Телефон: ${phone}
-        Email: ${email}
-        Коментар: ${comment || 'Немає коментаря'}
-        Модель: ${model}
-        Колір: ${color}
-        Матеріал: ${material}
-        Посилання: ${shareableLink}
-      `,
+                Нове замовлення конфігурації!
+
+                Клієнт:
+                - Ім'я: ${name}
+                - Телефон: ${phone}
+                - Email: ${email}
+                
+                Деталі конфігурації:
+                - Модель: ${model}
+                - Вибір:
+                  - ${customizationText}
+                
+                Коментар клієнта:
+                ${comment || 'Немає коментаря'}
+                
+                Посилання для перегляду: ${shareableLink}
+            `,
                 "Attachments": [
                     {
                         "Name": "model-screenshot.png",
@@ -92,17 +116,21 @@ const setupServer = (port) => {
             const mailToClient = {
                 "From": process.env.SMTP_USER,
                 "To": email,
-                "Subject": 'Ваш запит отримано',
+                "Subject": 'Ваш запит на конфігурацію отримано',
                 "TextBody": `
-        Дякуємо за ваш запит, ${name}!
-        Ваш вибір:
-        - Модель: ${model}
-        - Колір: ${color}
-        - Матеріал: ${material}
-        Ви можете переглянути вашу конфігурацію за посиланням: ${shareableLink}
-        Ми зв'яжемося з вами найближчим часом.
-      `
+                Дякуємо за ваш запит, ${name}!
+                
+                Ми отримали вашу конфігурацію і зв'яжемося з вами найближчим часом.
+                
+                Ваш вибір:
+                - Модель: ${model}
+                - Опис:
+                  - ${customizationText}
+                
+                Ви можете переглянути вашу конфігурацію за посиланням: ${shareableLink}
+            `
             };
+
 
 
             //             const mailToOwner = {

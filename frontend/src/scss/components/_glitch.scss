@@ -1,0 +1,66 @@
+// _glitch.scss
+@import "../abstracts/variables";
+
+// --- Glitch Effect ---
+// Переменные для глитча (можно вынести в _variables.scss, если они общие)
+$glitch-primaryColor: $accentDark; // Цвет основного текста глитча
+$glitch-secondaryColor: white;   // Цвет фона "слоев" глитча
+$glitch-color1: #ffb000;         // Цвет тени первого слоя
+$glitch-color2: #0e68dd;         // Цвет тени второго слоя
+$glitch-steps: 20;
+
+.glitch {
+  position: relative;
+  // margin: 0 auto; // Убрал, т.к. позиционирование лучше задавать родительскому элементу
+  color: $glitch-primaryColor;
+  font-size: 1.5em; // Базовый размер, можно переопределить
+  // text-align: left; // Убрал, пусть наследуется или задается по месту
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  transform: scale3d(1,1,1); // Можно убрать, если не используется для анимации
+
+  &[data-text]::before, // Используем data-text атрибут для текста глитча
+  &[data-text]::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0; // Или ваш сдвиг top: -10px;
+    left: 0;
+    right: 0;
+    overflow: hidden;
+    background: $glitch-secondaryColor;
+    color: $glitch-primaryColor; // Текст слоев должен быть таким же, как основной
+    clip: rect(0, 900px, 0, 0);
+    // opacity: 0.8; // Можно добавить прозрачность слоям
+  }
+
+  &[data-text]::before {
+    left: 4px; // Сдвиг первого слоя
+    text-shadow: 1px 0 $glitch-color1;
+    animation: glitch-effect-before 3s infinite linear alternate-reverse;
+  }
+
+  &[data-text]::after {
+    left: -2px; // Сдвиг второго слоя (в другую сторону для разнообразия)
+    text-shadow: -1px 0 $glitch-color2;
+    animation: glitch-effect-after 2s infinite linear alternate-reverse;
+  }
+}
+
+// Разделяем анимации для большей гибкости
+@keyframes glitch-effect-before {
+  @for $i from 0 through $glitch-steps {
+    #{percentage($i * (1 / $glitch-steps))} {
+      clip: rect(random(100) + px, 9999px, random(100) + px, 0);
+      transform: translate(#{random(10) - 5}px, #{random(10) - 5}px); // Небольшое дрожание
+    }
+  }
+}
+
+@keyframes glitch-effect-after {
+  @for $i from 0 through $glitch-steps {
+    #{percentage($i * (1 / $glitch-steps))} {
+      clip: rect(random(100) + px, 9999px, random(100) + px, 0);
+      transform: translate(#{random(6) - 3}px, #{random(6) - 3}px);
+    }
+  }
+}
